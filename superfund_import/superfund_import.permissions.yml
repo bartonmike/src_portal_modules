@@ -1,0 +1,4 @@
+administer superfund import:
+  title: 'Administer Superfund Import'
+  description: 'Configure the Superfund import URL, schedule, and trigger manual runs.'
+  restrict access: true

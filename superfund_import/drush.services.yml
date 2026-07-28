@@ -1,0 +1,7 @@
+services:
+  superfund_import.commands:
+    class: Drupal\superfund_import\Commands\SuperfundImportCommands
+    arguments:
+      - '@superfund_import.importer'
+    tags:
+      - { name: drush.command }

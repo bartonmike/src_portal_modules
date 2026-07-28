@@ -1,0 +1,4 @@
+administer custom blocks:
+  title: 'Administer Superfund Blocks'
+  description: 'Configure settings for all custom blocks.'
+  restrict access: true

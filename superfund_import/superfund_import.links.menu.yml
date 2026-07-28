@@ -1,0 +1,6 @@
+superfund_import.settings:
+  title: 'Superfund Import'
+  description: 'Configure ZIP URL, cron interval, and run imports manually.'
+  route_name: superfund_import.settings
+  parent: system.admin_config_system
+  weight: 50

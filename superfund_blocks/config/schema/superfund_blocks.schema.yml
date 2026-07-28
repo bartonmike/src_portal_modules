@@ -1,0 +1,10 @@
+superfund_blocks.settings:
+  type: config_object
+  label: 'Superfund Blocks settings'
+  mapping:
+    global_css_class:
+      type: string
+      label: 'Global CSS class'
+    debug_mode:
+      type: boolean
+      label: 'Debug mode'

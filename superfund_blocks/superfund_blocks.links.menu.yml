@@ -1,0 +1,6 @@
+superfund_blocks.settings:
+  title: 'Superfund Blocks'
+  description: 'Configure global settings for Superfund Blocks.'
+  parent: system.admin_config_content
+  route_name: superfund_blocks.settings
+  weight: 50

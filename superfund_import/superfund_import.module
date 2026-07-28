@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @file
+ * Superfund Import module — downloads a ZIP of CSVs and imports into custom tables.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function superfund_import_help($route_name, RouteMatchInterface $route_match) {
+  if ($route_name === 'help.page.superfund_import') {
+    return '<p>' . t('Downloads a ZIP file from a configured URL, extracts CSV files, and imports each into the corresponding <code>superfund_*</code> table. Configure the URL and cron frequency at <a href=":url">Superfund Import Settings</a>.', [':url' => '/admin/config/superfund-import']) . '</p>';
+  }
+}
+
+/**
+ * Implements hook_cron().
+ *
+ * Runs the import on a configurable interval (stored in state).
+ */
+function superfund_import_cron() {
+  $config   = \Drupal::config('superfund_import.settings');
+  $interval = (int) $config->get('cron_interval') ?: 86400; // default: daily
+  $last_run = \Drupal::state()->get('superfund_import.last_run', 0);
+
+  if (\Drupal::time()->getRequestTime() - $last_run >= $interval) {
+    \Drupal::logger('superfund_import')->info('Cron triggered: starting Superfund import.');
+
+    /** @var \Drupal\superfund_import\Service\SuperfundImportService $importer */
+    $importer = \Drupal::service('superfund_import.importer');
+    $result   = $importer->run();
+
+    if ($result['success']) {
+      \Drupal::logger('superfund_import')->info(
+        'Import complete. Tables processed: @tables. Rows inserted: @rows.',
+        ['@tables' => $result['tables'], '@rows' => $result['rows']]
+      );
+    }
+    else {
+      \Drupal::logger('superfund_import')->error(
+        'Import failed: @error',
+        ['@error' => $result['error']]
+      );
+    }
+
+    \Drupal::state()->set('superfund_import.last_run', \Drupal::time()->getRequestTime());
+  }
+}

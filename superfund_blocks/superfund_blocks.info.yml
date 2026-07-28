@@ -1,0 +1,5 @@
+name: 'Superfund Blocks'
+type: module
+description: 'Provides configurable custom blocks with PHP logic for Drupal 10.'
+package: Custom
+core_version_requirement: ^10

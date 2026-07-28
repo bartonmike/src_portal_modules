@@ -1,0 +1,7 @@
+superfund_blocks.settings:
+  path: '/admin/config/custom-blocks/settings'
+  defaults:
+    _form: '\Drupal\superfund_blocks\Form\SuperfundBlocksSettingsForm'
+    _title: 'Superfund Blocks Settings'
+  requirements:
+    _permission: 'administer custom blocks'

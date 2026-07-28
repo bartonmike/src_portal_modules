@@ -1,0 +1,7 @@
+name: 'Superfund Import'
+type: module
+description: 'Downloads a ZIP of CSVs from a URL and imports them into superfund_ prefixed tables on a configurable cron schedule.'
+core_version_requirement: ^10 || ^11
+package: Custom
+dependencies:
+  - drupal:system

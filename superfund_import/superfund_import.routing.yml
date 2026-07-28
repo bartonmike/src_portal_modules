@@ -1,0 +1,15 @@
+superfund_import.settings:
+  path: '/admin/config/superfund-import'
+  defaults:
+    _form: '\Drupal\superfund_import\Form\SuperfundImportSettingsForm'
+    _title: 'Superfund Import Settings'
+  requirements:
+    _permission: 'administer superfund import'
+
+superfund_import.run_now:
+  path: '/admin/config/superfund-import/run'
+  defaults:
+    _controller: '\Drupal\superfund_import\Controller\SuperfundImportController::runNow'
+    _title: 'Run Import Now'
+  requirements:
+    _permission: 'administer superfund import'

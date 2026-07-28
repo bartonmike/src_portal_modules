@@ -1,0 +1,8 @@
+services:
+  superfund_import.importer:
+    class: Drupal\superfund_import\Service\SuperfundImportService
+    arguments:
+      - '@database'
+      - '@config.factory'
+      - '@logger.factory'
+      - '@file_system'
