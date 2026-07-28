@@ -250,6 +250,24 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     }],
   };
 
+  var config = {
+  displayModeBar: true,
+  modeBarButtonsToAdd: [
+    {
+      name: 'color toggler',
+      icon: icon1,
+      click: function(gd) {
+        var newColor = colors[Math.floor(3 * Math.random())]
+        Plotly.restyle(gd, 'line.color', newColor)
+      }},
+    {
+      name: 'button1',
+      icon: Plotly.Icons.pencil,
+      direction: 'up',
+      click: function(gd) {alert('button1')
+    }}],
+  modeBarButtonsToRemove: ['pan2d','select2d','lasso2d','resetScale2d','zoomOut2d']}
+
   function renderChart() {
     Plotly.newPlot(chartDiv, [trace], layout, { responsive: true });
 
