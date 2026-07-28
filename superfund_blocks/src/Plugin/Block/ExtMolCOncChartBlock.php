@@ -215,10 +215,6 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
   }*/
 
   // ---- Chart ---------------------------------------------------------------
-  var tickText = sampleNames.map(function (name, i) {
-    return '<a href="/samples/view?id=' + sampleIds[i] + '">' + name + '</a>';
-  });
-
   var trace = {
     type: 'bar',
     x: sampleNames,
@@ -231,9 +227,6 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     xaxis: {
       tickangle: -45,
       tickfont: { size: 8 },
-      tickmode: 'array',
-      tickvals: sampleNames,
-      ticktext: tickText,
     },
     yaxis: {
       title: { text: 'Concentration ' + unit },
