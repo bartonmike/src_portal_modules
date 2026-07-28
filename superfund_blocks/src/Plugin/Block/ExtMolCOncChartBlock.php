@@ -251,10 +251,10 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
   };
 
 
-  var icon1 = {
-    width: 500,
-    height: 600,
-    path: 'M224 512c35.32 0 63.97-28.65 63.97-64H160.03c0 35.35 28.65 64 63.97 64zm215.39-149.71c-19.32-20.76-55.47-51.99-55.47-154.29 0-77.7-54.48-139.9-127.94-155.16V32c0-17.67-14.32-32-31.98-32s-31.98 14.33-31.98 32v20.84C118.56 68.1 64.08 130.3 64.08 208c0 102.3-36.15 133.53-55.47 154.29-6 6.45-8.66 14.16-8.61 21.71.11 16.4 12.98 32 32.1 32h383.8c19.12 0 32-15.6 32.1-32 .05-7.55-2.61-15.27-8.61-21.71z',
+  var downloadIcon = {
+    width: 512,
+    height: 512,
+    path: 'M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64z',
   };
 
   var colors = ['green', 'red', 'blue'];
@@ -265,7 +265,7 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     modeBarButtonsToAdd: [
       {
         name: 'color toggler',
-        icon: icon1,
+        icon: downloadIcon,
         click: function (gd) {
           var newColor = colors[Math.floor(3 * Math.random())];
           Plotly.restyle(gd, 'marker.color', newColor);
