@@ -266,7 +266,8 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
       direction: 'up',
       click: function(gd) {alert('button1')
     }}],
-  modeBarButtonsToRemove: ['pan2d','select2d','lasso2d','resetScale2d','zoomOut2d']}
+//  modeBarButtonsToRemove: ['pan2d','select2d','lasso2d','resetScale2d','zoomOut2d']
+};
 
   function renderChart() {
     Plotly.newPlot(chartDiv, [trace], layout, { responsive: true });
