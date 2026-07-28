@@ -166,10 +166,7 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
       . "values across analytes."
       . "</div>";
 
-    $btn_id = 'btn-dl-ext-mol-conc-' . $sanitized_id;
     $html   = "<div id='{$chart_id}' style='width:100%;min-height:400px;'></div>"
-#      . "<button id='{$btn_id}' class='superfund-csv-download' style='margin:8px 0;'>"
-#      . "&#11015; Download CSV</button>"
       . $descriptor;
 
     // Inline init script — no defer, wraps itself in DOMContentLoaded so it
@@ -183,7 +180,6 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
   }
 
   var chartDiv    = document.getElementById('{$chart_id}');
-  var btnEl       = document.getElementById('{$btn_id}');
   var settings    = drupalSettings.superfundBlocks.extMolConc['{$chart_id}'];
   var sampleNames = settings.sampleNames;
   var sampleIds   = settings.sampleIds;
@@ -191,28 +187,26 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
   var unit        = settings.unit;
   var csvRows     = settings.csvRows;
 
- /* // ---- CSV download --------------------------------------------------------
-  if (btnEl) {
-    btnEl.addEventListener('click', function () {
-      var headers = ['Sample Name', 'Sample ID', 'Molar Concentration', 'Unit'];
-      var lines   = [headers.join(',')];
-      csvRows.forEach(function (row) {
-        lines.push([
-          '"' + String(row.sample_name).replace(/"/g, '""') + '"',
-          '"' + String(row.sample_id).replace(/"/g, '""') + '"',
-          row.measurement_value_molar,
-          '"' + String(row.unit).replace(/"/g, '""') + '"',
-        ].join(','));
-      });
-      var blob = new Blob([lines.join('\n')], { type: 'text/csv' });
-      var url  = URL.createObjectURL(blob);
-      var a    = document.createElement('a');
-      a.href     = url;
-      a.download = 'ext-mol-conc-{$sanitized_id}.csv';
-      a.click();
-      URL.revokeObjectURL(url);
+  // ---- CSV download ---------------------------------------------------------
+  function downloadCsv() {
+    var headers = ['Sample Name', 'Sample ID', 'Molar Concentration', 'Unit'];
+    var lines   = [headers.join(',')];
+    csvRows.forEach(function (row) {
+      lines.push([
+        '"' + String(row.sample_name).replace(/"/g, '""') + '"',
+        '"' + String(row.sample_id).replace(/"/g, '""') + '"',
+        row.measurement_value_molar,
+        '"' + String(row.unit).replace(/"/g, '""') + '"',
+      ].join(','));
     });
-  }*/
+    var blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'ext-mol-conc-{$sanitized_id}.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   // ---- Chart ---------------------------------------------------------------
   var tickText = sampleNames.map(function (name, i) {
@@ -257,18 +251,16 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     path: 'M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64z',
   };
 
-  var colors = ['green', 'red', 'blue'];
-
   var config = {
     responsive: true,
     displayModeBar: true,
     modeBarButtonsToAdd: [
       {
-        name: 'color toggler',
+        name: 'download-data',
+        title: 'Download CSV',
         icon: downloadIcon,
-        click: function (gd) {
-          var newColor = colors[Math.floor(3 * Math.random())];
-          Plotly.restyle(gd, 'marker.color', newColor);
+        click: function () {
+          downloadCsv();
         },
       },
     ],
