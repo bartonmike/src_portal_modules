@@ -271,14 +271,6 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
           Plotly.restyle(gd, 'marker.color', newColor);
         },
       },
-      {
-        name: 'button1',
-        icon: Plotly.Icons.pencil,
-        direction: 'up',
-        click: function (gd) {
-          alert('button1');
-        },
-      },
     ],
     modeBarButtonsToRemove: ['pan2d', 'select2d', 'lasso2d', 'resetScale2d', 'zoomOut2d'],
   };
