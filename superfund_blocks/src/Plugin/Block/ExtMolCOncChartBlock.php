@@ -257,7 +257,7 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
         },
       },
     ],
-    modeBarButtonsToRemove: ['pan2d', 'select2d', 'lasso2d', 'resetScale2d', 'zoomOut2d'],
+    modeBarButtonsToRemove: [/*'pan2d', 'select2d', 'resetScale2d', */'lasso2d', 'zoomOut2d'],
   };
 
   // Open a sample's detail page in a new tab.
@@ -276,6 +276,7 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
         return;
       }
       tickEl.style.cursor = 'pointer';
+      tickEl.style.pointerEvents = 'all';
       tickEl.onclick = function () {
         goToSample(sampleIds[i]);
       };
