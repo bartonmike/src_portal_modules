@@ -171,7 +171,14 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
 
     // Inline init script — no defer, wraps itself in DOMContentLoaded so it
     // runs safely whether Plotly CDN has finished loading or not.
-    $js = <<<JS
+    $js = "var tickText = sampleNames.map(function (name, i) {
+    var sampleUrl = '/samples/view?id=' + encodeURIComponent(sampleIds[i]);
+    //var finalSampleUrl = '<a href=" . '"' . "' + sampleUrl + '" . '"' . ">' + name + '</a>';
+    console.log(finalSampleUrl);
+    return finalSampleUrl;
+  });";
+    
+    $js .= <<<JS
 (function init() {
   // Poll until both Plotly and the chart container are ready.
   if (typeof Plotly === 'undefined' || !document.getElementById('{$chart_id}')) {
@@ -209,13 +216,13 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
   }
 
   // ---- Chart ---------------------------------------------------------------
-  var tickText = sampleNames.map(function (name, i) {
+  /*var tickText = sampleNames.map(function (name, i) {
     var sampleUrl = '/samples/view?id=' + encodeURIComponent(sampleIds[i]);
-    //var finalSampleUrl = '<a href="' + sampleUrl + '">' + name + '</a>';
-    var finalSampleUrl = `<a href="${sampleUrl}">${name}</a>`;
+    var finalSampleUrl = '<a href="' + sampleUrl + '">' + name + '</a>';
+    //var finalSampleUrl = `<a href="${sampleUrl}">${name}</a>`;
     console.log(finalSampleUrl);
     return finalSampleUrl;
-  });
+  });*/
 
   var trace = {
     type: 'bar',
