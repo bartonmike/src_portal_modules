@@ -216,7 +216,7 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     //var sampleUrl = window.location.origin + '/samples/view?id=' + encodeURIComponent(sampleIds[i]);
     var sampleUrl = '/samples/view?id=' + sampleIds[i];
     //console.log('/samples/view?id=' + encodeURIComponent(sampleIds[i]));
-    return '<a href=' + sampleUrl + '>' + name + '</a>';
+    return "<a href='" + sampleUrl + "'>" + name + '</a>';
   });
 
   var trace = {
