@@ -197,7 +197,7 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
     $lines_by_endpoint = [];
     foreach ($line_rows as $row) {
       $lines_by_endpoint[$row->end_point_name][] = [
-        'x' => (float) $row->x_val,
+        'x' => (float) $row->x_val * 100,
         'y' => (float) $row->y_val,
       ];
     }
@@ -301,12 +301,11 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
     //      DOMContentLoaded, and exposes a render function on window so a
     //      companion endpoint-selector block can switch datasets later.
     // -------------------------------------------------------------------------
-    $html = "<style>"
-      . "#{$chart_id}-info { text-align: center; margin-bottom: 8px; }"
+    $css = "#{$chart_id}-info { text-align: center; margin-bottom: 8px; }"
       . "#{$chart_id}-title { font-size: 22px; font-weight: 700; color: #2c3e50; margin: 0 0 4px; }"
-      . "#{$chart_id}-subtitle { font-size: 14px; color: #6c757d; line-height: 1.5; }"
-      . "</style>"
-      . "<div id='{$chart_id}-info' class='zf-response-info'>"
+      . "#{$chart_id}-subtitle { font-size: 14px; color: #6c757d; line-height: 1.5; }";
+
+    $html = "<div id='{$chart_id}-info' class='zf-response-info'>"
       . "<h4 id='{$chart_id}-title'></h4>"
       . "<div id='{$chart_id}-subtitle'></div>"
       . "</div>"
@@ -488,6 +487,19 @@ JS;
               '#attributes' => ['src' => 'https://cdn.plot.ly/plotly-2.35.2.min.js'],
             ],
             'plotly_cdn',
+          ],
+          // Title/subtitle styling — added via html_head rather than an
+          // inline <style> in #markup, since #markup content is run through
+          // Drupal's Xss::filter(), which strips <style> tags (they're not
+          // in the default allowed-tags list) and leaves the CSS text
+          // behind as visible page content.
+          [
+            [
+              '#type'  => 'html_tag',
+              '#tag'   => 'style',
+              '#value' => $css,
+            ],
+            'superfund_chem_zf_bmd_resp_style_' . $sanitized_id,
           ],
           // Inline init script — no defer, polls for Plotly readiness.
           [
