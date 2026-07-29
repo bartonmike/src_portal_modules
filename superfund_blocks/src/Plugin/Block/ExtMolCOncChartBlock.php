@@ -209,10 +209,6 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
   }
 
   // ---- Chart ---------------------------------------------------------------
-  var tickText = sampleNames.map(function (name, i) {
-    return '<a href="/samples/view?id=' + sampleIds[i] + '">' + name + '</a>';
-  });
-
   var trace = {
     type: 'bar',
     x: sampleNames,
@@ -225,9 +221,6 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     xaxis: {
       tickangle: -45,
       tickfont: { size: 8 },
-      tickmode: 'array',
-      tickvals: sampleNames,
-      ticktext: tickText,
     },
     yaxis: {
       title: { text: 'Concentration ' + unit },
@@ -267,13 +260,35 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     modeBarButtonsToRemove: ['pan2d', 'select2d', 'lasso2d', 'resetScale2d', 'zoomOut2d'],
   };
 
+  // Navigate to a sample's detail page.
+  function goToSample(sampId) {
+    window.location.href = '/samples/view?id=' + encodeURIComponent(sampId);
+  }
+
+  // Plotly renders tick labels as plain SVG text; its own pseudo-HTML <a>
+  // parsing on ticktext has proven unreliable here, so listeners are
+  // attached directly to the rendered elements after each draw instead
+  // (initial render, resize, and zoom/relayout all re-trigger this).
+  function linkTickLabels() {
+    var ticks = chartDiv.querySelectorAll('.xtick > text');
+    ticks.forEach(function (tickEl, i) {
+      if (sampleIds[i] === undefined) {
+        return;
+      }
+      tickEl.style.cursor = 'pointer';
+      tickEl.onclick = function () {
+        goToSample(sampleIds[i]);
+      };
+    });
+  }
+
   function renderChart() {
     Plotly.newPlot(chartDiv, [trace], layout, config);
 
+    chartDiv.on('plotly_afterplot', linkTickLabels);
+
     chartDiv.on('plotly_click', function (data) {
-      var idx    = data.points[0].pointIndex;
-      var sampId = sampleIds[idx];
-      window.location.href = '/samples/view?id=' + sampId;
+      goToSample(sampleIds[data.points[0].pointIndex]);
     });
   }
 
