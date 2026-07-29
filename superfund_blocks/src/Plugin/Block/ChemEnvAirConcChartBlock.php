@@ -10,19 +10,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Provides an Environment Water Concentration chart block.
+ * Provides a Chemical Environment Air Concentration chart block.
  *
  * Displays a Plotly bar chart of PSD-Water/PSD-Air environment
  * concentrations for a chemical identified by the ?id= query parameter.
  * Bars and x-axis labels link through to the sample detail page.
  *
  * @Block(
- *   id = "superfund_blocks_env_water_conc_chart",
- *   admin_label = @Translation("Environment Water Concentration Chart"),
+ *   id = "superfund_blocks_chem_env_air_conc_chart",
+ *   admin_label = @Translation("Chemical Environment Air Concentration Chart"),
  *   category = @Translation("Superfund Blocks"),
  * )
  */
-class EnvWaterConcChartBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
+class ChemEnvAirConcChartBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
 
   /**
    * The database connection.
@@ -117,7 +117,7 @@ class EnvWaterConcChartBlock extends BlockBase implements BlockPluginInterface, 
         AND vstc.Chemical_ID = :chem_id
         AND (vstc.environment_concentration_qualifier != 'U'
              OR vstc.environment_concentration_qualifier IS NULL)
-        AND vstc.environment_concentration_unit IN ('ng/L')
+        AND vstc.environment_concentration_unit IN ('ng/m3', 'ng/m^3', 'ng/m³')
       ORDER BY vstc.environment_concentration DESC";
 
     $rows = $this->database
@@ -169,7 +169,7 @@ class EnvWaterConcChartBlock extends BlockBase implements BlockPluginInterface, 
     }
 
     // Use a unique chart ID per chemical so multiple blocks don't collide.
-    $chart_id = 'chart-env-water-conc-' . $sanitized_id;
+    $chart_id = 'chart-chem-env-air-conc-' . $sanitized_id;
 
     // -------------------------------------------------------------------------
     // 5. Build the render array.
@@ -178,9 +178,9 @@ class EnvWaterConcChartBlock extends BlockBase implements BlockPluginInterface, 
     //    - Chart init JS lives in an inline script that waits for
     //      DOMContentLoaded.
     // -------------------------------------------------------------------------
-    $descriptor = "<div class='water-meas-plot element-descriptor'>"
-      . "<strong>Water Measurements:</strong> Our passive samplers were used to "
-      . "collect and measure chemicals present in water."
+    $descriptor = "<div class='air-meas-plot element-descriptor'>"
+      . "<strong>Air Measurements:</strong> Our passive samplers were used to "
+      . "collect and measure chemicals present in air."
       . "</div>";
 
     $html = "<div id='{$chart_id}' style='width:100%;min-height:400px;'></div>"
@@ -197,7 +197,7 @@ class EnvWaterConcChartBlock extends BlockBase implements BlockPluginInterface, 
   }
 
   var chartDiv    = document.getElementById('{$chart_id}');
-  var settings    = drupalSettings.superfundBlocks.envWaterConc['{$chart_id}'];
+  var settings    = drupalSettings.superfundBlocks.chemEnvAirConc['{$chart_id}'];
   var sampleNames = settings.sampleNames;
   var sampleIds   = settings.sampleIds;
   var values      = settings.values;
@@ -226,7 +226,7 @@ class EnvWaterConcChartBlock extends BlockBase implements BlockPluginInterface, 
     var url  = URL.createObjectURL(blob);
     var a    = document.createElement('a');
     a.href     = url;
-    a.download = 'env-water-conc-{$sanitized_id}.csv';
+    a.download = 'chem-env-air-conc-{$sanitized_id}.csv';
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -326,7 +326,7 @@ JS;
         // Pass chart data safely via drupalSettings — no inline JSON blobs.
         'drupalSettings' => [
           'superfundBlocks' => [
-            'envWaterConc' => [
+            'chemEnvAirConc' => [
               $chart_id => [
                 'sampleNames' => $sample_names,
                 'sampleIds'   => $sample_ids,
@@ -355,7 +355,7 @@ JS;
               '#tag'   => 'script',
               '#value' => $js,
             ],
-            'superfund_env_water_conc_init_' . $sanitized_id,
+            'superfund_chem_env_air_conc_init_' . $sanitized_id,
           ],
         ],
       ],

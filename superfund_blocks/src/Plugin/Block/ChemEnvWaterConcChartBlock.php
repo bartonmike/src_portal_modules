@@ -10,19 +10,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Provides an Extract Molar Concentration chart block.
+ * Provides a Chemical Environment Water Concentration chart block.
  *
- * Displays a Plotly bar chart of PSD-Water/PSD-Air molar concentrations
- * for a chemical identified by the ?id= query parameter. Bars and x-axis
- * labels link through to the sample detail page.
+ * Displays a Plotly bar chart of PSD-Water/PSD-Air environment
+ * concentrations for a chemical identified by the ?id= query parameter.
+ * Bars and x-axis labels link through to the sample detail page.
  *
  * @Block(
- *   id = "superfund_blocks_ext_mol_conc_chart",
- *   admin_label = @Translation("Extract Molar Concentration Chart"),
+ *   id = "superfund_blocks_chem_env_water_conc_chart",
+ *   admin_label = @Translation("Chemical Environment Water Concentration Chart"),
  *   category = @Translation("Superfund Blocks"),
  * )
  */
-class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
+class ChemEnvWaterConcChartBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
 
   /**
    * The database connection.
@@ -105,8 +105,8 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
           ELSE vs.Sample_ID
         END AS SampleName,
         vs.Sample_ID,
-        vstc.measurement_value_molar,
-        vstc.measurement_value_molar_unit
+        vstc.environment_concentration,
+        vstc.environment_concentration_unit
       FROM view_samplesToChemicals vstc
         JOIN view_chemicals vc ON vc.Chemical_ID = vstc.Chemical_ID
         JOIN view_samples   vs ON vs.Sample_ID   = vstc.Sample_ID
@@ -117,7 +117,8 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
         AND vstc.Chemical_ID = :chem_id
         AND (vstc.environment_concentration_qualifier != 'U'
              OR vstc.environment_concentration_qualifier IS NULL)
-      ORDER BY vstc.measurement_value_molar DESC";
+        AND vstc.environment_concentration_unit IN ('ng/L')
+      ORDER BY vstc.environment_concentration DESC";
 
     $rows = $this->database
       ->query($sql, [':chem_id' => $sanitized_id])
@@ -139,34 +140,50 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     foreach ($rows as $row) {
       $sample_names[] = $row->SampleName;
       $sample_ids[]   = $row->Sample_ID;
-      // NOTE: original code cast to int — change to (float) if you need decimals.
-      $values[]       = (int) $row->measurement_value_molar;
-      $unit           = $row->measurement_value_molar_unit;
+      $values[]       = (float) $row->environment_concentration;
+      $unit           = $row->environment_concentration_unit;
       // Full row data for CSV download.
       $csv_rows[] = [
-        'sample_name'             => $row->SampleName,
-        'sample_id'               => $row->Sample_ID,
-        'measurement_value_molar' => $row->measurement_value_molar,
-        'unit'                    => $row->measurement_value_molar_unit,
+        'sample_name'   => $row->SampleName,
+        'sample_id'     => $row->Sample_ID,
+        'concentration' => $row->environment_concentration,
+        'unit'          => $row->environment_concentration_unit,
       ];
     }
 
+    switch ($unit) {
+      case 'ng/m3':
+      case 'ng/m^3':
+      case 'ng/m³':
+        $title = 'Air Concentration (ng/m³)';
+        $unit  = 'ng/m³';
+        break;
+
+      case 'ng/L':
+        $title = 'Water Concentration (ng/L)';
+        break;
+
+      default:
+        $title = 'Concentration (' . $unit . ')';
+        break;
+    }
+
     // Use a unique chart ID per chemical so multiple blocks don't collide.
-    $chart_id = 'chart-ext-mol-conc-' . $sanitized_id;
+    $chart_id = 'chart-chem-env-water-conc-' . $sanitized_id;
 
     // -------------------------------------------------------------------------
     // 5. Build the render array.
     //    - Plotly CDN loaded via html_head (no defer — causes race conditions).
     //    - Chart data passed through drupalSettings (the Drupal-safe way).
-    //    - Chart init JS lives in an inline script that waits for DOMContentLoaded.
+    //    - Chart init JS lives in an inline script that waits for
+    //      DOMContentLoaded.
     // -------------------------------------------------------------------------
-    $descriptor = "<div class='inst-meas-moles-plot element-descriptor'>"
-      . "<strong>Instrument Measurements:</strong> Concentrations are shown in pmol/mL, "
-      . "converted from instrument concentrations (pg/µL) into molar units to standardize "
-      . "values across analytes."
+    $descriptor = "<div class='water-meas-plot element-descriptor'>"
+      . "<strong>Water Measurements:</strong> Our passive samplers were used to "
+      . "collect and measure chemicals present in water."
       . "</div>";
 
-    $html   = "<div id='{$chart_id}' style='width:100%;min-height:400px;'></div>"
+    $html = "<div id='{$chart_id}' style='width:100%;min-height:400px;'></div>"
       . $descriptor;
 
     // Inline init script — no defer, wraps itself in DOMContentLoaded so it
@@ -180,22 +197,28 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
   }
 
   var chartDiv    = document.getElementById('{$chart_id}');
-  var settings    = drupalSettings.superfundBlocks.extMolConc['{$chart_id}'];
+  var settings    = drupalSettings.superfundBlocks.chemEnvWaterConc['{$chart_id}'];
   var sampleNames = settings.sampleNames;
   var sampleIds   = settings.sampleIds;
   var values      = settings.values;
   var unit        = settings.unit;
+  var title       = settings.title;
   var csvRows     = settings.csvRows;
+
+  // Navigate to a sample's detail page.
+  function goToSample(sampId) {
+    window.location.href = '/samples/view?id=' + encodeURIComponent(sampId);
+  }
 
   // ---- CSV download ---------------------------------------------------------
   function downloadCsv() {
-    var headers = ['Sample Name', 'Sample ID', 'Molar Concentration', 'Unit'];
+    var headers = ['Sample Name', 'Sample ID', 'Concentration', 'Unit'];
     var lines   = [headers.join(',')];
     csvRows.forEach(function (row) {
       lines.push([
         '"' + String(row.sample_name).replace(/"/g, '""') + '"',
         '"' + String(row.sample_id).replace(/"/g, '""') + '"',
-        row.measurement_value_molar,
+        row.concentration,
         '"' + String(row.unit).replace(/"/g, '""') + '"',
       ].join(','));
     });
@@ -203,7 +226,7 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     var url  = URL.createObjectURL(blob);
     var a    = document.createElement('a');
     a.href     = url;
-    a.download = 'ext-mol-conc-{$sanitized_id}.csv';
+    a.download = 'chem-env-water-conc-{$sanitized_id}.csv';
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -225,7 +248,7 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
   };
 
   var layout = {
-    title: { text: 'Extract Molar Concentration (pmol/mL)' },
+    title: { text: title },
     xaxis: {
       type: 'category',
       tickangle: -45,
@@ -248,7 +271,6 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
       font: { size: 12 },
     }],
   };
-
 
   var downloadIcon = {
     width: 512,
@@ -274,6 +296,10 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
 
   function renderChart() {
     Plotly.newPlot(chartDiv, [trace], layout, config);
+
+    chartDiv.on('plotly_click', function (data) {
+      goToSample(sampleIds[data.points[0].pointIndex]);
+    });
   }
 
   if (chartDiv.offsetWidth !== 0) {
@@ -300,12 +326,13 @@ JS;
         // Pass chart data safely via drupalSettings — no inline JSON blobs.
         'drupalSettings' => [
           'superfundBlocks' => [
-            'extMolConc' => [
+            'chemEnvWaterConc' => [
               $chart_id => [
                 'sampleNames' => $sample_names,
                 'sampleIds'   => $sample_ids,
                 'values'      => $values,
                 'unit'        => $unit,
+                'title'       => $title,
                 'csvRows'     => $csv_rows,
               ],
             ],
@@ -328,13 +355,12 @@ JS;
               '#tag'   => 'script',
               '#value' => $js,
             ],
-            'superfund_ext_mol_conc_init_' . $sanitized_id,
+            'superfund_chem_env_water_conc_init_' . $sanitized_id,
           ],
         ],
       ],
       '#cache' => [
         'contexts' => ['url.query_args:id'],
-        'max-age'  => 0,
       ],
     ];
   }
