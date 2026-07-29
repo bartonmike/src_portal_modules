@@ -284,9 +284,12 @@ class ChemZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInterf
       return;
     }
 
-    var render = window.superfundBlocks
-      && window.superfundBlocks.chemZfBmdResp
-      && window.superfundBlocks.chemZfBmdResp['{$chart_id}'];
+    var render = null;
+    if (window.superfundBlocks) {
+      if (window.superfundBlocks.chemZfBmdResp) {
+        render = window.superfundBlocks.chemZfBmdResp['{$chart_id}'];
+      }
+    }
 
     if (typeof render === 'function') {
       render(target.getAttribute('data-endpoint-key'));
