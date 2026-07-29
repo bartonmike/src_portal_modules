@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Provides an Environment Air Concentration chart block.
  *
- * Displays a Highcharts bar chart of PSD-Water/PSD-Air environment
+ * Displays a Plotly bar chart of PSD-Water/PSD-Air environment
  * concentrations for a chemical identified by the ?id= query parameter.
  * Bars and x-axis labels link through to the sample detail page.
  *
@@ -129,7 +129,7 @@ class EnvAirConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     }
 
     // -------------------------------------------------------------------------
-    // 4. Build data arrays for Highcharts.
+    // 4. Build data arrays for Plotly.
     // -------------------------------------------------------------------------
     $sample_names = [];
     $sample_ids   = [];
@@ -165,8 +165,7 @@ class EnvAirConcChartBlock extends BlockBase implements BlockPluginInterface, Co
 
     // -------------------------------------------------------------------------
     // 5. Build the render array.
-    //    - Highcharts CDN loaded via html_head (no defer — causes race
-    //      conditions).
+    //    - Plotly CDN loaded via html_head (no defer — causes race conditions).
     //    - Chart data passed through drupalSettings (the Drupal-safe way).
     //    - Chart init JS lives in an inline script that waits for
     //      DOMContentLoaded.
@@ -180,11 +179,11 @@ class EnvAirConcChartBlock extends BlockBase implements BlockPluginInterface, Co
       . $descriptor;
 
     // Inline init script — no defer, wraps itself in DOMContentLoaded so it
-    // runs safely whether Highcharts CDN has finished loading or not.
+    // runs safely whether Plotly CDN has finished loading or not.
     $js = <<<JS
 (function init() {
-  // Poll until Highcharts, drupalSettings, and the chart container are ready.
-  if (typeof Highcharts === 'undefined' || typeof drupalSettings === 'undefined' || !document.getElementById('{$chart_id}')) {
+  // Poll until Plotly, drupalSettings, and the chart container are ready.
+  if (typeof Plotly === 'undefined' || typeof drupalSettings === 'undefined' || !document.getElementById('{$chart_id}')) {
     setTimeout(init, 50);
     return;
   }
@@ -202,51 +201,69 @@ class EnvAirConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     window.location.href = '/samples/view?id=' + encodeURIComponent(sampId);
   }
 
-  var chartOptions = {
-    chart: {
-      type: 'column',
-      zoomType: 'x',
-    },
-    title: {
-      text: title,
-    },
-    subtitle: {
-      text: '(drag zooming is allowed)',
-    },
-    xAxis: {
-      categories: sampleNames,
-      labels: {
-        step: 1,
-        useHTML: true,
-        rotation: -45,
-        style: { fontSize: '8px' },
-        formatter: function () {
-          var sampId = sampleIds[this.pos];
-          return '<a href="/samples/view?id=' + encodeURIComponent(sampId) + '">' + this.value + '</a>';
-        },
-      },
-    },
-    yAxis: {
-      min: 0,
-      title: { text: 'Concentration ' + unit },
-    },
-    series: [
-      {
-        name: 'Concentration',
-        showInLegend: false,
-        data: values,
-        point: {
-          events: {
-            click: function () {
-              goToSample(sampleIds[this.index]);
-            },
-          },
-        },
-      },
-    ],
+  // ---- Chart ---------------------------------------------------------------
+  var tickText = sampleNames.map(function (name, i) {
+    var sampleUrl = '/samples/view?id=' + encodeURIComponent(sampleIds[i]);
+    return '<a href="' + sampleUrl + '">' + name + '</a>';
+  });
+
+  var trace = {
+    type: 'bar',
+    x: sampleNames,
+    y: values,
+    hovertemplate: '%{x}<br>%{y} ' + unit + '<extra></extra>',
   };
 
-  Highcharts.chart(chartDiv, chartOptions);
+  var layout = {
+    title: { text: title },
+    xaxis: {
+      tickangle: -45,
+      tickfont: { size: 8 },
+      tickmode: 'array',
+      tickvals: sampleNames,
+      ticktext: tickText,
+    },
+    yaxis: {
+      title: { text: 'Concentration ' + unit },
+      rangemode: 'tozero',
+    },
+    dragmode: 'zoom',
+    annotations: [{
+      text: '(drag zooming is allowed)',
+      showarrow: false,
+      xref: 'paper', yref: 'paper',
+      x: 0.5, y: 1.06,
+      xanchor: 'center',
+      font: { size: 12 },
+    }],
+  };
+
+  var config = {
+    responsive: true,
+  };
+
+  function renderChart() {
+    Plotly.newPlot(chartDiv, [trace], layout, config);
+
+    chartDiv.on('plotly_click', function (data) {
+      goToSample(sampleIds[data.points[0].pointIndex]);
+    });
+  }
+
+  if (chartDiv.offsetWidth !== 0) {
+    renderChart();
+  } else {
+    var observer = new ResizeObserver(function (entries) {
+      for (var entry of entries) {
+        if (entry.contentRect.width !== 0) {
+          observer.disconnect();
+          renderChart();
+          break;
+        }
+      }
+    });
+    observer.observe(chartDiv);
+  }
 })();
 JS;
 
@@ -269,17 +286,16 @@ JS;
           ],
         ],
         'html_head' => [
-          // Highcharts CDN — no defer so it's available before the init
-          // script runs.
+          // Plotly CDN — no defer so it's available before the init script runs.
           [
             [
               '#type'       => 'html_tag',
               '#tag'        => 'script',
-              '#attributes' => ['src' => 'https://code.highcharts.com/highcharts.js'],
+              '#attributes' => ['src' => 'https://cdn.plot.ly/plotly-2.35.2.min.js'],
             ],
-            'highcharts_cdn',
+            'plotly_cdn',
           ],
-          // Inline init script — no defer, polls for Highcharts readiness.
+          // Inline init script — no defer, polls for Plotly readiness.
           [
             [
               '#type'  => 'html_tag',
