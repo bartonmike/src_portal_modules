@@ -211,8 +211,9 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
   // ---- Chart ---------------------------------------------------------------
   var tickText = sampleNames.map(function (name, i) {
     var sampleUrl = '/samples/view?id=' + encodeURIComponent(sampleIds[i]);
-    console.log(sampleUrl);
-    return '<a href="' + sampleUrl + '">' + name + '</a>';
+    var finalSampleUrl = '<a href="' + sampleUrl + '">' + name + '</a>';
+    console.log(finalSampleUrl);
+    return finalSampleUrl;
   });
 
   var trace = {
