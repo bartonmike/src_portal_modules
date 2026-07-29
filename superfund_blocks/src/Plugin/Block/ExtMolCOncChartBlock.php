@@ -260,9 +260,9 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     modeBarButtonsToRemove: ['pan2d', 'select2d', 'lasso2d', 'resetScale2d', 'zoomOut2d'],
   };
 
-  // Navigate to a sample's detail page.
+  // Open a sample's detail page in a new tab.
   function goToSample(sampId) {
-    window.location.href = '/samples/view?id=' + encodeURIComponent(sampId);
+    window.open('/samples/view?id=' + encodeURIComponent(sampId), '_blank');
   }
 
   // Plotly renders tick labels as plain SVG text; its own pseudo-HTML <a>
@@ -286,10 +286,6 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     Plotly.newPlot(chartDiv, [trace], layout, config);
 
     chartDiv.on('plotly_afterplot', linkTickLabels);
-
-    chartDiv.on('plotly_click', function (data) {
-      goToSample(sampleIds[data.points[0].pointIndex]);
-    });
   }
 
   if (chartDiv.offsetWidth !== 0) {
