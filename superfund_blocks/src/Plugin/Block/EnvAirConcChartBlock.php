@@ -183,8 +183,8 @@ class EnvAirConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     // runs safely whether Highcharts CDN has finished loading or not.
     $js = <<<JS
 (function init() {
-  // Poll until both Highcharts and the chart container are ready.
-  if (typeof Highcharts === 'undefined' || !document.getElementById('{$chart_id}')) {
+  // Poll until Highcharts, drupalSettings, and the chart container are ready.
+  if (typeof Highcharts === 'undefined' || typeof drupalSettings === 'undefined' || !document.getElementById('{$chart_id}')) {
     setTimeout(init, 50);
     return;
   }

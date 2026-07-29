@@ -173,8 +173,8 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     // runs safely whether Plotly CDN has finished loading or not.
     $js = <<<JS
 (function init() {
-  // Poll until both Plotly and the chart container are ready.
-  if (typeof Plotly === 'undefined' || !document.getElementById('{$chart_id}')) {
+  // Poll until Plotly, drupalSettings, and the chart container are ready.
+  if (typeof Plotly === 'undefined' || typeof drupalSettings === 'undefined' || !document.getElementById('{$chart_id}')) {
     setTimeout(init, 50);
     return;
   }
