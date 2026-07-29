@@ -214,6 +214,7 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
   // relative URLs silently fail to render correctly, so build an absolute one.
   var tickText = sampleNames.map(function (name, i) {
     var sampleUrl = window.location.origin + '/samples/view?id=' + encodeURIComponent(sampleIds[i]);
+    console.log('/samples/view?id=' + encodeURIComponent(sampleIds[i]));
     return '<a href="' + sampleUrl + '">' + name + '</a>';
   });
 
@@ -268,7 +269,7 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
         },
       },
     ],
-    modeBarButtonsToRemove: [/*'pan2d', 'select2d', 'resetScale2d', */'lasso2d', 'zoomOut2d'],
+    modeBarButtonsToRemove: ['pan2d', 'select2d', 'resetScale2d', 'lasso2d', 'zoomOut2d'],
   };
 
   function renderChart() {
