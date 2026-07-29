@@ -243,6 +243,7 @@ class EnvAirConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     x: sampleIds,
     y: values,
     text: sampleNames,
+    textposition: 'none',
     hovertemplate: '%{text}<br>%{y} ' + unit + '<extra></extra>',
   };
 
