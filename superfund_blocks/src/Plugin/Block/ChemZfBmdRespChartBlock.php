@@ -197,8 +197,8 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
     $lines_by_endpoint = [];
     foreach ($line_rows as $row) {
       $lines_by_endpoint[$row->end_point_name][] = [
-        'x' => (float) $row->x_val * 100,
-        'y' => (float) $row->y_val,
+        'x' => (float) $row->x_val,
+        'y' => (float) $row->y_val * 100,
       ];
     }
 
