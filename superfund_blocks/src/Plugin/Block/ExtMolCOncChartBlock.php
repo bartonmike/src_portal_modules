@@ -213,9 +213,10 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
   // titles) only recognizes hrefs that start with http:// or https:// —
   // relative URLs silently fail to render correctly, so build an absolute one.
   var tickText = sampleNames.map(function (name, i) {
-    var sampleUrl = window.location.origin + '/samples/view?id=' + encodeURIComponent(sampleIds[i]);
-    console.log('/samples/view?id=' + encodeURIComponent(sampleIds[i]));
-    return '<a href="' + sampleUrl + '">' + name + '</a>';
+    //var sampleUrl = window.location.origin + '/samples/view?id=' + encodeURIComponent(sampleIds[i]);
+    var sampleUrl = '/samples/view?id=' + sampleIds[i];
+    //console.log('/samples/view?id=' + encodeURIComponent(sampleIds[i]));
+    return '<a href=' + sampleUrl + '>' + name + '</a>';
   });
 
   var trace = {
