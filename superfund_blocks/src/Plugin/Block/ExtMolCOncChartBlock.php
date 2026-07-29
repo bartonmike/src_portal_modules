@@ -209,6 +209,10 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
   }
 
   // ---- Chart ---------------------------------------------------------------
+  var tickText = sampleNames.map(function (name, i) {
+    return '<a href="/samples/view?id=' + encodeURIComponent(sampleIds[i]) + '">' + name + '</a>';
+  });
+
   var trace = {
     type: 'bar',
     x: sampleNames,
@@ -221,6 +225,9 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     xaxis: {
       tickangle: -45,
       tickfont: { size: 8 },
+      tickmode: 'array',
+      tickvals: sampleNames,
+      ticktext: tickText,
     },
     yaxis: {
       title: { text: 'Concentration ' + unit },
@@ -260,33 +267,8 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     modeBarButtonsToRemove: [/*'pan2d', 'select2d', 'resetScale2d', */'lasso2d', 'zoomOut2d'],
   };
 
-  // Open a sample's detail page in a new tab.
-  function goToSample(sampId) {
-    window.open('/samples/view?id=' + encodeURIComponent(sampId), '_blank');
-  }
-
-  // Plotly renders tick labels as plain SVG text; its own pseudo-HTML <a>
-  // parsing on ticktext has proven unreliable here, so listeners are
-  // attached directly to the rendered elements after each draw instead
-  // (initial render, resize, and zoom/relayout all re-trigger this).
-  function linkTickLabels() {
-    var ticks = chartDiv.querySelectorAll('.xtick > text');
-    ticks.forEach(function (tickEl, i) {
-      if (sampleIds[i] === undefined) {
-        return;
-      }
-      tickEl.style.cursor = 'pointer';
-      tickEl.style.pointerEvents = 'all';
-      tickEl.onclick = function () {
-        goToSample(sampleIds[i]);
-      };
-    });
-  }
-
   function renderChart() {
     Plotly.newPlot(chartDiv, [trace], layout, config);
-
-    chartDiv.on('plotly_afterplot', linkTickLabels);
   }
 
   if (chartDiv.offsetWidth !== 0) {
@@ -347,6 +329,7 @@ JS;
       ],
       '#cache' => [
         'contexts' => ['url.query_args:id'],
+        'max-age'  => 0,
       ],
     ];
   }
