@@ -209,8 +209,12 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
   }
 
   // ---- Chart ---------------------------------------------------------------
+  // Plotly's pseudo-HTML link parsing in text elements (ticktext, annotations,
+  // titles) only recognizes hrefs that start with http:// or https:// —
+  // relative URLs silently fail to render correctly, so build an absolute one.
   var tickText = sampleNames.map(function (name, i) {
-    return '<a href="/samples/view?id=' + encodeURIComponent(sampleIds[i]) + '">' + name + '</a>';
+    var sampleUrl = window.location.origin + '/samples/view?id=' + encodeURIComponent(sampleIds[i]);
+    return '<a href="' + sampleUrl + '">' + name + '</a>';
   });
 
   var trace = {
