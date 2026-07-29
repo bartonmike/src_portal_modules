@@ -242,8 +242,8 @@ class EnvWaterConcChartBlock extends BlockBase implements BlockPluginInterface, 
     type: 'bar',
     x: sampleIds,
     y: values,
-    text: sampleNames,
-    hovertemplate: '%{text}<br>%{y} ' + unit + '<extra></extra>',
+    //text: sampleNames,
+    hovertemplate: '%{sampleNames}<br>%{y} ' + unit + '<extra></extra>',
   };
 
   var layout = {
