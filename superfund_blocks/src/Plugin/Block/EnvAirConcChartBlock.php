@@ -240,18 +240,20 @@ class EnvAirConcChartBlock extends BlockBase implements BlockPluginInterface, Co
 
   var trace = {
     type: 'bar',
-    x: sampleNames,
+    x: sampleIds,
     y: values,
-    hovertemplate: '%{x}<br>%{y} ' + unit + '<extra></extra>',
+    text: sampleNames,
+    hovertemplate: '%{text}<br>%{y} ' + unit + '<extra></extra>',
   };
 
   var layout = {
     title: { text: title },
     xaxis: {
+      type: 'category',
       tickangle: -45,
       tickfont: { size: 8 },
       tickmode: 'array',
-      tickvals: sampleNames,
+      tickvals: sampleIds,
       ticktext: tickText,
     },
     yaxis: {
