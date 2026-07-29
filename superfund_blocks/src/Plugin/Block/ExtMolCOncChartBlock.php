@@ -171,7 +171,13 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
 
     // Inline init script — no defer, wraps itself in DOMContentLoaded so it
     // runs safely whether Plotly CDN has finished loading or not.
-    $js = "var tickText = sampleNames.map(function (name, i) {
+    $js = <<<JS
+     var chartDiv    = document.getElementById('{$chart_id}');
+  var settings    = drupalSettings.superfundBlocks.extMolConc['{$chart_id}'];
+  var sampleNames = settings.sampleNames;
+  JS;
+
+  $js .= var tickText = sampleNames.map(function (name, i) {
     var sampleUrl = '/samples/view?id=' + encodeURIComponent(sampleIds[i]);
     //var finalSampleUrl = '<a href=" . '"' . "' + sampleUrl + '" . '"' . ">' + name + '</a>';
     console.log(finalSampleUrl);
@@ -186,9 +192,9 @@ class ExtMolConcChartBlock extends BlockBase implements BlockPluginInterface, Co
     return;
   }
 
-  var chartDiv    = document.getElementById('{$chart_id}');
-  var settings    = drupalSettings.superfundBlocks.extMolConc['{$chart_id}'];
-  var sampleNames = settings.sampleNames;
+  //var chartDiv    = document.getElementById('{$chart_id}');
+  //var settings    = drupalSettings.superfundBlocks.extMolConc['{$chart_id}'];
+  //var sampleNames = settings.sampleNames;
   var sampleIds   = settings.sampleIds;
   var values      = settings.values;
   var unit        = settings.unit;
