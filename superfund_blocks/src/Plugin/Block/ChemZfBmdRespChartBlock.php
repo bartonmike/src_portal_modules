@@ -188,7 +188,8 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
       ->query(
         "SELECT DISTINCT zcxy.End_Point_Name AS end_point_name, zcxy.X_vals AS x_val, zcxy.Y_vals AS y_val
          FROM view_zebrafishChemXYCoords zcxy
-         WHERE zcxy.Chemical_ID = :chem_id AND zcxy.End_Point_Name IN (:endpoint_names[])",
+         WHERE zcxy.Chemical_ID = :chem_id AND zcxy.End_Point_Name IN (:endpoint_names[])
+         ORDER BY zcxy.End_Point_Name, zcxy.X_vals",
         [':chem_id' => $sanitized_id, ':endpoint_names[]' => $endpoint_names]
       )
       ->fetchAll();
@@ -300,7 +301,12 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
     //      DOMContentLoaded, and exposes a render function on window so a
     //      companion endpoint-selector block can switch datasets later.
     // -------------------------------------------------------------------------
-    $html = "<div id='{$chart_id}-info' class='zf-response-info'>"
+    $html = "<style>"
+      . "#{$chart_id}-info { text-align: center; margin-bottom: 8px; }"
+      . "#{$chart_id}-title { font-size: 22px; font-weight: 700; color: #2c3e50; margin: 0 0 4px; }"
+      . "#{$chart_id}-subtitle { font-size: 14px; color: #6c757d; line-height: 1.5; }"
+      . "</style>"
+      . "<div id='{$chart_id}-info' class='zf-response-info'>"
       . "<h4 id='{$chart_id}-title'></h4>"
       . "<div id='{$chart_id}-subtitle'></div>"
       . "</div>"
@@ -378,7 +384,13 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
     xaxis: {
       title: { text: 'Dilution' },
     },
-    showlegend: false,
+    showlegend: true,
+    legend: {
+      orientation: 'h',
+      x: 0.5,
+      xanchor: 'center',
+      y: -0.2,
+    },
     dragmode: 'zoom',
   };
 
@@ -399,10 +411,12 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
 
     var lineTrace = {
       type: 'scatter',
-      mode: 'lines',
+      mode: 'lines+markers',
       name: 'Fitted Curve',
       x: dataset.line.map(function (p) { return p.x; }),
       y: dataset.line.map(function (p) { return p.y; }),
+      line: { color: '#7cb5ec', width: 2 },
+      marker: { color: '#7cb5ec', size: 5 },
     };
 
     var scatterTrace = {
@@ -416,8 +430,11 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
         symmetric: false,
         array: dataset.doseResponse.map(function (p) { return p.errorPlus; }),
         arrayminus: dataset.doseResponse.map(function (p) { return p.errorMinus; }),
+        color: '#000000',
+        thickness: 1.5,
+        width: 4,
       },
-      marker: { size: 8 },
+      marker: { color: '#6c63d1', symbol: 'diamond', size: 9 },
     };
 
     Plotly.react(chartDiv, [lineTrace, scatterTrace], layout, config);
