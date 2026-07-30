@@ -108,7 +108,15 @@ class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginIn
     //    - Chart init JS lives in an inline script that waits for
     //      DOMContentLoaded.
     // -------------------------------------------------------------------------
-    $html = "<div id='{$chart_id}' style='width:100%;height:400px;'></div>";
+    $descriptor = "<div class='chem-overview-endpoints-plot element-descriptor'>"
+      . "<strong>Zebrafish Endpoints:</strong> Counts of the total number of measurements "
+      . "captured from assays of zebrafish exposure to chemicals. To look at a specific "
+      . "chemical, search and select using the table below. Click the underlined chemical "
+      . "name in the first column to open a chemical page."
+      . "</div>";
+
+    $html = "<div id='{$chart_id}' style='width:100%;height:400px;'></div>"
+      . $descriptor;
 
     // Inline init script — no defer, wraps itself in DOMContentLoaded so it
     // runs safely whether Plotly CDN has finished loading or not.
