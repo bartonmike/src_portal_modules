@@ -356,6 +356,7 @@ JS;
       ],
       '#cache' => [
         'contexts' => ['url.query_args:id'],
+        'max-age'  => 0,
       ],
     ];
   }
