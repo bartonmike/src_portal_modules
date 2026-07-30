@@ -194,6 +194,8 @@ class ChemGeneExpChartBlock extends BlockBase implements BlockPluginInterface, C
     // runs safely whether Plotly CDN has finished loading or not.
     $js = <<<JS
 (function init() {
+  console.log('[chemGeneExp] init() called for {$chart_id}. Plotly?', typeof Plotly, 'drupalSettings?', typeof drupalSettings, 'div?', !!document.getElementById('{$chart_id}'));
+
   // Poll until Plotly, drupalSettings, and the chart container are ready.
   if (typeof Plotly === 'undefined' || typeof drupalSettings === 'undefined' || !document.getElementById('{$chart_id}')) {
     setTimeout(init, 50);
