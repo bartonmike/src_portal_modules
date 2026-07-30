@@ -291,7 +291,7 @@ class ChemEnvWaterConcChartBlock extends BlockBase implements BlockPluginInterfa
         },
       },
     ],
-    modeBarButtonsToRemove: ['pan2d', 'select2d', 'resetScale2d', 'lasso2d', 'zoomOut2d'],
+    modeBarButtonsToRemove: ['pan2d', 'select2d', 'resetScale2d', 'lasso2d'/*, 'zoomOut2d'*/],
   };
 
   function renderChart() {

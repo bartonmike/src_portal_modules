@@ -29,6 +29,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
 
   /**
+   * Decimal places to round AUC/BMD10/BMD50 to for display.
+   */
+  protected const SUMMARY_DECIMALS = 2;
+
+  /**
    * The database connection.
    *
    * @var \Drupal\Core\Database\Connection
@@ -94,6 +99,13 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
       default:
         return '';
     }
+  }
+
+  /**
+   * Rounds a summary value (AUC/BMD10/BMD50) for display.
+   */
+  protected function roundSummaryValue(float $value): float {
+    return round($value, self::SUMMARY_DECIMALS);
   }
 
   /**
@@ -264,9 +276,9 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
       $summary = $summary_by_endpoint[$endpoint_name] ?? NULL;
 
       $model    = $summary ? htmlspecialchars((string) $summary->model, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : '';
-      $auc_norm = $summary ? (float) $summary->auc_norm : 0.0;
-      $bmd10    = $summary ? (float) $summary->bmd10 : 0.0;
-      $bmd50    = $summary ? (float) $summary->bmd50 : 0.0;
+      $auc_norm = $summary ? $this->roundSummaryValue((float) $summary->auc_norm) : 0.0;
+      $bmd10    = $summary ? $this->roundSummaryValue((float) $summary->bmd10) : 0.0;
+      $bmd50    = $summary ? $this->roundSummaryValue((float) $summary->bmd50) : 0.0;
       $qc_icon  = $summary ? $this->dataQcIconHtml($summary->dataqc_flag) : '';
       $endpoint_name_html = $this->endpointNameHtml($endpoint_name, $summary->endpoint_link ?? NULL);
 
@@ -371,7 +383,7 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
         },
       },
     ],
-    modeBarButtonsToRemove: ['pan2d', 'select2d', 'resetScale2d', 'lasso2d', 'zoomOut2d'],
+    modeBarButtonsToRemove: ['pan2d', 'select2d', 'resetScale2d', 'lasso2d'/*, 'zoomOut2d'*/],
   };
 
   var layout = {
