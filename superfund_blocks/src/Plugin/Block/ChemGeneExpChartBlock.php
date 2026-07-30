@@ -341,7 +341,7 @@ JS;
               '#tag'        => 'script',
               '#attributes' => ['src' => 'https://cdn.plot.ly/plotly-2.35.2.min.js'],
             ],
-            'plotly_cdn',
+            'plotly_cdn_gene_exp_' . $sanitized_id,
           ],
           // Inline init script — no defer, polls for Plotly readiness.
           [
