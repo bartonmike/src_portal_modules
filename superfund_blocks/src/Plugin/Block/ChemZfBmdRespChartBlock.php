@@ -337,7 +337,7 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
       . "<h4 id='{$chart_id}-title'></h4>"
       . "<div id='{$chart_id}-subtitle'></div>"
       . "</div>"
-      . "<div id='{$chart_id}' style='width:100%;min-height:400px;'></div>"
+      . "<div id='{$chart_id}' style='width:100%;height:400px;'></div>"
       . "<br /><div class='zf-response-plot element-descriptor'>"
       . "<strong>Zebrafish Morphological Measurements Plot:</strong> "
       . "Plots can be selected from the measurements table on the left."
