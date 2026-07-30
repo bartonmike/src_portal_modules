@@ -31,7 +31,7 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
   /**
    * Decimal places to round AUC/BMD10/BMD50 to for display.
    */
-  protected const SUMMARY_DECIMALS = 2;
+  protected const SUMMARY_DECIMALS = 4;
 
   /**
    * The database connection.
@@ -106,6 +106,17 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
    */
   protected function roundSummaryValue(float $value): float {
     return round($value, self::SUMMARY_DECIMALS);
+  }
+
+  /**
+   * Formats a rounded summary value (AUC/BMD10/BMD50) for display.
+   *
+   * A value of exactly 0 shows as "NA" — it represents missing/null data
+   * here, since a missing BMD row or a null field is coerced to 0.0 before
+   * reaching this point.
+   */
+  protected function formatSummaryValue(float $value): string {
+    return $value === 0.0 ? 'NA' : (string) $value;
   }
 
   /**
@@ -283,7 +294,8 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
       $endpoint_name_html = $this->endpointNameHtml($endpoint_name, $summary->endpoint_link ?? NULL);
 
       $subtitle_html = $endpoint_name_html . ' - model: <b>' . $model . '</b><br /> AUC: '
-        . $auc_norm . ', BMD10: ' . $bmd10 . ', BMD50: ' . $bmd50;
+        . $this->formatSummaryValue($auc_norm) . ', BMD10: ' . $this->formatSummaryValue($bmd10)
+        . ', BMD50: ' . $this->formatSummaryValue($bmd50);
 
       $endpoints[] = [
         'name' => $endpoint_name,
@@ -313,9 +325,13 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
     //      DOMContentLoaded, and exposes a render function on window so a
     //      companion endpoint-selector block can switch datasets later.
     // -------------------------------------------------------------------------
+    // Fixed min-heights on the title/subtitle keep the chart and everything
+    // below it from shifting position when switching endpoints — subtitle
+    // length (model name, endpoint name, reference links) varies enough to
+    // change its line-wrapped height otherwise.
     $css = "#{$chart_id}-info { text-align: center; margin-bottom: 8px; }"
-      . "#{$chart_id}-title { font-size: 22px; font-weight: 700; color: #2c3e50; margin: 0 0 4px; }"
-      . "#{$chart_id}-subtitle { font-size: 14px; color: #6c757d; line-height: 1.5; }";
+      . "#{$chart_id}-title { font-size: 22px; font-weight: 700; color: #2c3e50; margin: 0 0 4px; min-height: 28px; }"
+      . "#{$chart_id}-subtitle { font-size: 14px; color: #6c757d; line-height: 1.5; min-height: 42px; }";
 
     $html = "<div id='{$chart_id}-info' class='zf-response-info'>"
       . "<h4 id='{$chart_id}-title'></h4>"
