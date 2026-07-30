@@ -200,6 +200,8 @@ class ChemGeneExpChartBlock extends BlockBase implements BlockPluginInterface, C
     return;
   }
 
+  console.log('[chemGeneExp] init ready-gate passed for {$chart_id}');
+
   var chartDiv    = document.getElementById('{$chart_id}');
   var settings    = drupalSettings.superfundBlocks.chemGeneExp['{$chart_id}'];
   var categories  = settings.categories;
@@ -264,6 +266,7 @@ class ChemGeneExpChartBlock extends BlockBase implements BlockPluginInterface, C
     hovermode: 'x unified',
     xaxis: {
       type: 'category',
+      categoryorder: 'array',
       categoryarray: categories,
     },
     yaxis: {
@@ -282,14 +285,24 @@ class ChemGeneExpChartBlock extends BlockBase implements BlockPluginInterface, C
   };
 
   function renderChart() {
-    Plotly.newPlot(chartDiv, traces, layout, config);
+    console.log('[chemGeneExp] renderChart() called for {$chart_id}', traces, layout, config);
+    Plotly.newPlot(chartDiv, traces, layout, config)
+      .then(function () {
+        console.log('[chemGeneExp] Plotly.newPlot resolved for {$chart_id}');
+      })
+      .catch(function (err) {
+        console.error('[chemGeneExp] Plotly.newPlot rejected for {$chart_id}', err);
+      });
   }
+
+  console.log('[chemGeneExp] init reached render-decision for {$chart_id}, offsetWidth =', chartDiv.offsetWidth);
 
   if (chartDiv.offsetWidth !== 0) {
     renderChart();
   } else {
     var observer = new ResizeObserver(function (entries) {
       for (var entry of entries) {
+        console.log('[chemGeneExp] ResizeObserver fired for {$chart_id}, width =', entry.contentRect.width);
         if (entry.contentRect.width !== 0) {
           observer.disconnect();
           renderChart();
