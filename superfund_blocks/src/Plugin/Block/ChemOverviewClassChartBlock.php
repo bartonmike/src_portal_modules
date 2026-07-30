@@ -167,13 +167,19 @@ class ChemOverviewClassChartBlock extends BlockBase implements BlockPluginInterf
     type: 'pie',
     labels: labels,
     values: values,
-    textinfo: 'label+value',
+    textinfo: 'value',
     textposition: 'outside',
-    hovertemplate: '<b>%{value}</b> (%{percent})<extra></extra>',
+    hovertemplate: '<b>%{label}: %{value}</b> (%{percent})<extra></extra>',
   };
 
   var layout = {
-    showlegend: false,
+    showlegend: true,
+    legend: {
+      orientation: 'h',
+      x: 0.5,
+      xanchor: 'center',
+      y: -0.1,
+    },
   };
 
   function renderChart() {
