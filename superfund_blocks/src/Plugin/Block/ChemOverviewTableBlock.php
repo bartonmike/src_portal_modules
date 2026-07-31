@@ -200,6 +200,35 @@ JS;
       '#markup'   => $html,
       '#attached' => [
         'html_head' => [
+          // jQuery + DataTables — not loaded sitewide, so this block brings
+          // its own copies.
+          [
+            [
+              '#type'       => 'html_tag',
+              '#tag'        => 'script',
+              '#attributes' => ['src' => 'https://code.jquery.com/jquery-3.7.1.js'],
+            ],
+            'jquery_cdn_chem_overview_table',
+          ],
+          [
+            [
+              '#type'       => 'html_tag',
+              '#tag'        => 'link',
+              '#attributes' => [
+                'rel'  => 'stylesheet',
+                'href' => 'https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css',
+              ],
+            ],
+            'datatables_css_cdn_chem_overview_table',
+          ],
+          [
+            [
+              '#type'       => 'html_tag',
+              '#tag'        => 'script',
+              '#attributes' => ['src' => 'https://cdn.datatables.net/2.3.2/js/dataTables.js'],
+            ],
+            'datatables_js_cdn_chem_overview_table',
+          ],
           [
             [
               '#type'  => 'html_tag',

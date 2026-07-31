@@ -161,9 +161,7 @@ class ChemGeneExpTableBlock extends BlockBase implements BlockPluginInterface, C
 
     // -------------------------------------------------------------------------
     // 5. Basic DataTables enhancement (pagination only — this table isn't a
-    //    graph selector, so no click handling is needed). Polls for the
-    //    DataTable library since it's expected to be loaded as a sitewide
-    //    library rather than by this block.
+    //    graph selector, so no click handling is needed).
     // -------------------------------------------------------------------------
     $js = <<<JS
 (function init() {
@@ -183,6 +181,35 @@ JS;
       '#markup'   => $html,
       '#attached' => [
         'html_head' => [
+          // jQuery + DataTables — not loaded sitewide, so this block brings
+          // its own copies.
+          [
+            [
+              '#type'       => 'html_tag',
+              '#tag'        => 'script',
+              '#attributes' => ['src' => 'https://code.jquery.com/jquery-3.7.1.js'],
+            ],
+            'jquery_cdn_chem_gene_exp_table',
+          ],
+          [
+            [
+              '#type'       => 'html_tag',
+              '#tag'        => 'link',
+              '#attributes' => [
+                'rel'  => 'stylesheet',
+                'href' => 'https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css',
+              ],
+            ],
+            'datatables_css_cdn_chem_gene_exp_table',
+          ],
+          [
+            [
+              '#type'       => 'html_tag',
+              '#tag'        => 'script',
+              '#attributes' => ['src' => 'https://cdn.datatables.net/2.3.2/js/dataTables.js'],
+            ],
+            'datatables_js_cdn_chem_gene_exp_table',
+          ],
           [
             [
               '#type'  => 'html_tag',
