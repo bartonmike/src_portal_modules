@@ -158,6 +158,24 @@ class EnvSampOverviewTableBlock extends BlockBase implements BlockPluginInterfac
   var selectedTech     = [];
   var selectedTests    = [];
 
+  // Shows/hides every .filters row on the page by class, based on computed
+  // style (not just this table's — matches the filter-toggle behavior used
+  // elsewhere on the site).
+  if (typeof window.toggleFilters !== 'function') {
+    window.toggleFilters = function () {
+      var elements = document.querySelectorAll('.filters');
+      elements.forEach(function (el) {
+        var currentDisplay = window.getComputedStyle(el).display;
+        if (currentDisplay !== 'none') {
+          el.style.display = 'none';
+        }
+        else {
+          el.style.display = '';
+        }
+      });
+    };
+  }
+
   function stripHtml(v) {
     if (v == null) {
       return '';
@@ -243,13 +261,10 @@ class EnvSampOverviewTableBlock extends BlockBase implements BlockPluginInterfac
       var api = this.api();
 
       var toggleBtn = document.querySelector('#sample_locations thead .filters-toggle-button');
-      var filterRow = document.querySelector('#sample_locations thead tr.filters');
       if (toggleBtn) {
-        if (filterRow) {
-          toggleBtn.addEventListener('click', function () {
-            filterRow.style.display = filterRow.style.display === 'none' ? '' : 'none';
-          });
-        }
+        toggleBtn.addEventListener('click', function () {
+          window.toggleFilters();
+        });
       }
 
       // Single-select (exact match): Sample Name (1), Location (3).
