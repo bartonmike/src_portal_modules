@@ -61,7 +61,7 @@ class EnvSampOverviewChemOccurrenceChartBlock extends BlockBase implements Block
     // -------------------------------------------------------------------------
     // 1. Fetch the chemical-occurrence count per class, across all samples.
     // -------------------------------------------------------------------------
-    $sql = "SELECT
+    $sql = "SELECT distinct
         CASE WHEN vc.chemical_class IS NULL THEN 'Unclassified' ELSE vc.chemical_class END AS class,
         COUNT(*) AS count
       FROM view_samplesToChemicals vstc
