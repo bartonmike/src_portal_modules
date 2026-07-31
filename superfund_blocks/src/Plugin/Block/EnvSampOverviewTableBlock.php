@@ -127,7 +127,7 @@ class EnvSampOverviewTableBlock extends BlockBase implements BlockPluginInterfac
       . '<th>Tests Run</th>'
       . '</tr>'
       . "<tr class='filters-toggle'>"
-      . "<th colspan='7'>"
+      . "<th colspan='7' style='text-align:center;'>"
       . "<button type='button' class='filters-toggle-button'>"
       . "<i class='fa-solid fa-filter'></i> Show/hide filters"
       . '</button>'
@@ -139,6 +139,16 @@ class EnvSampOverviewTableBlock extends BlockBase implements BlockPluginInterfac
       . '</thead>'
       . '<tbody>' . implode('', $body_rows) . '</tbody>'
       . '</table>';
+
+    $css = ".filters-toggle-button {"
+      . 'background: #f5f5f5;'
+      . 'color: #000;'
+      . 'border: 1px solid #ccc;'
+      . 'border-radius: 999px;'
+      . 'padding: 6px 16px;'
+      . 'cursor: pointer;'
+      . '}'
+      . '.filters-toggle-button:hover { background: #e6e6e6; }';
 
     // -------------------------------------------------------------------------
     // 3. DataTables init: filters-toggle button, single-select exact-match
@@ -260,12 +270,15 @@ class EnvSampOverviewTableBlock extends BlockBase implements BlockPluginInterfac
     initComplete: function () {
       var api = this.api();
 
-      var toggleBtn = document.querySelector('#sample_locations thead .filters-toggle-button');
-      if (toggleBtn) {
-        toggleBtn.addEventListener('click', function () {
+      // Delegated on the table itself rather than a direct reference to the
+      // button — DataTables can rebuild/rewrap header cells during init,
+      // which would leave a directly-attached listener bound to a node
+      // that's no longer the one on screen.
+      document.getElementById('sample_locations').addEventListener('click', function (event) {
+        if (event.target.closest('.filters-toggle-button')) {
           window.toggleFilters();
-        });
-      }
+        }
+      });
 
       // Single-select (exact match): Sample Name (1), Location (3).
       var singleSelectCols = [1, 3];
@@ -367,6 +380,14 @@ JS;
               '#attributes' => ['src' => 'https://cdn.datatables.net/2.3.2/js/dataTables.js'],
             ],
             'datatables_js_cdn_env_samp_overview_table',
+          ],
+          [
+            [
+              '#type'  => 'html_tag',
+              '#tag'   => 'style',
+              '#value' => $css,
+            ],
+            'superfund_env_samp_overview_table_style',
           ],
           [
             [
