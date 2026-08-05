@@ -90,7 +90,8 @@ class EnvSampOverviewChemOccurrenceChartBlock extends BlockBase implements Block
 
     $chart_id = 'chart-env-samp-overview-chem-occurrence';
 
-    // -------------------------------------------------------------------------
+    // --------------------------
+    // -----------------------------------------------
     // 2. Build the render array.
     //    - Plotly CDN loaded via html_head (no defer — causes race conditions).
     //    - Chart data passed through drupalSettings (the Drupal-safe way).

@@ -1,0 +1,153 @@
+<?php
+
+namespace Drupal\superfund_blocks\Plugin\Block;
+
+use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+
+/**
+ * Provides the Chemical Info Header block.
+ *
+ * Displays the name, description, DTXSID, molecular formula, chemical class,
+ * and structure image for the chemical identified by the ?id= query
+ * parameter. Meant to sit above the other chemical-page blocks.
+ *
+ * @Block(
+ *   id = "superfund_blocks_chem_info_header",
+ *   admin_label = @Translation("Chemical Info Header"),
+ *   category = @Translation("Superfund Blocks"),
+ * )
+ */
+class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
+
+  /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected Connection $database;
+
+  /**
+   * The request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected RequestStack $requestStack;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    Connection $database,
+    RequestStack $request_stack,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->database = $database;
+    $this->requestStack = $request_stack;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('database'),
+      $container->get('request_stack'),
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function build(): array {
+    // -------------------------------------------------------------------------
+    // 1. Get and validate ?id= query parameter.
+    // -------------------------------------------------------------------------
+    $request      = $this->requestStack->getCurrentRequest();
+    $raw_id       = $request->query->get('id', '');
+    $sanitized_id = preg_replace('/[^0-9\-]/', '', $raw_id);
+
+    $row = NULL;
+    if (preg_match('/^\d+(-\d+)?$/', $sanitized_id)) {
+      // -------------------------------------------------------------------------
+      // 2. Fetch the chemical's info.
+      // -------------------------------------------------------------------------
+      $row = $this->database
+        ->query(
+          'SELECT
+            `PREFERRED_NAME` AS chemical_name,
+            `chemDescription` AS chemical_description,
+            `DTXSID` AS dtxsid,
+            `MOLECULAR_FORMULA` AS molecular_formula,
+            `chemical_class` AS chemical_class
+          FROM `view_chemicals`
+          WHERE `Chemical_ID` = :chem_id
+          LIMIT 1',
+          [':chem_id' => $sanitized_id]
+        )
+        ->fetchAssoc();
+    }
+
+    if (empty($row)) {
+      return [
+        '#markup' => "<div class='sample-info-header'><h1>Chemical Information</h1>"
+          . "<p>We couldn't find that Chemical ID, try <a href='/chemicals'>selecting it again</a>, "
+          . "otherwise <a href='/contact-us'>contact us</a> if this is in error.</p></div>",
+        '#cache' => ['contexts' => ['url.query_args:id']],
+      ];
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. Escape fields and build the header markup.
+    // -------------------------------------------------------------------------
+    $chemical_name_esc  = htmlspecialchars($row['chemical_name'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $description_esc    = htmlspecialchars($row['chemical_description'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $dtxsid_esc         = htmlspecialchars($row['dtxsid'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $chemical_class_esc = htmlspecialchars($row['chemical_class'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $dtxsid_url         = rawurlencode($row['dtxsid'] ?? '');
+
+    // Subscript the digits in the molecular formula, e.g. C6H6 -> C<sub>6</sub>H<sub>6</sub>.
+    $formula_esc = htmlspecialchars($row['molecular_formula'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $formula_esc = preg_replace('/(\d+)/', '<sub>$1</sub>', $formula_esc);
+
+    $chemical_image_url = "https://comptox.epa.gov/ctx-api/chemical/file/image/search/by-dtxsid/{$dtxsid_url}";
+    $dtxsid_link         = "https://comptox.epa.gov/dashboard/dsstoxdb/results?search={$dtxsid_url}";
+
+    $html = "<div class='sample-info-header'><h1>{$chemical_name_esc}</h1><p>{$description_esc}</p></div>"
+      . "<div class='sample-info'>"
+      . "<div class='info-box'>"
+      . "<div class='field_label'><h2>DTXSID</h2></div>"
+      . "<div class='field_value'><a href='{$dtxsid_link}'>{$dtxsid_esc}</a></div>"
+      . '</div>'
+      . "<div class='info-box'>"
+      . "<div class='field_label'><h2>Formula</h2></div>"
+      . "<div class='field_value'>{$formula_esc}</div>"
+      . '</div>'
+      . "<div class='info-box'>"
+      . "<div class='field_label'><h2>Chemical Class</h2></div>"
+      . "<div class='field_value'>{$chemical_class_esc}</div>"
+      . '</div>'
+      . "<div class='info-box'>"
+      . "<div class='field_value chemical-structure'><img alt='{$chemical_name_esc}' src='{$chemical_image_url}'/></div>"
+      . '</div>'
+      . '</div>';
+
+    return [
+      '#markup' => $html,
+      '#cache'  => [
+        'contexts' => ['url.query_args:id'],
+      ],
+    ];
+  }
+
+}
