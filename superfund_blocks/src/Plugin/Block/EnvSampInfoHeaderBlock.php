@@ -136,21 +136,27 @@ class EnvSampInfoHeaderBlock extends BlockBase implements BlockPluginInterface, 
       $project_link_html = "<a target='_blank' rel='noopener' href='{$project_link_esc}'>{$project_link_esc}</a>";
     }
 
+    // NOTE: the whitespace between </div> and the next <div class='info-box'>
+    // is load-bearing — the CSS Injector rule that spaces these boxes out
+    // relies on text-align:justify distributing space between inline-block
+    // children, which only works if there's whitespace between them to
+    // distribute. Collapsing this to a single concatenated string with no
+    // gaps makes the boxes jam together with no spacing.
     $html = "<div class='sample-info-header'><h1>Sample Information: {$sample_name_esc}</h1></div>"
       . "<div class='sample-info-header'><h2>Project Name: {$project_name_esc}</h2></div>"
       . "<div class='sample-info'>"
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Location</h2></div>"
       . "<div class='field_value'>{$location_name_esc}</div>"
-      . '</div>'
+      . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Sample IDs</h2></div>"
       . "<div class='field_value'>{$sample_id_esc}({$sample_number_esc})</div>"
-      . '</div>'
+      . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Technology</h2></div>"
       . "<div class='field_value'>{$technology_esc}</div>"
-      . '</div>'
+      . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Sample Matrix</h2></div>"
       . "<div class='field_value'>{$sample_matrix_esc}</div>"
@@ -160,11 +166,11 @@ class EnvSampInfoHeaderBlock extends BlockBase implements BlockPluginInterface, 
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Sample Date</h2></div>"
       . "<div class='field_value'>{$retrieval_date_esc}</div>"
-      . '</div>'
+      . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Tests Run</h2></div>"
       . "<div class='field_value'>{$test_list_esc}</div>"
-      . '</div>'
+      . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Project Link</h2></div>"
       . "<div class='field_value'>{$project_link_html}</div>"

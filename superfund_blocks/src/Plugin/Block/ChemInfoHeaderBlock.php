@@ -123,20 +123,26 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
     $chemical_image_url = "https://comptox.epa.gov/ctx-api/chemical/file/image/search/by-dtxsid/{$dtxsid_url}";
     $dtxsid_link         = "https://comptox.epa.gov/dashboard/dsstoxdb/results?search={$dtxsid_url}";
 
+    // NOTE: the whitespace between </div> and the next <div class='info-box'>
+    // is load-bearing — the CSS Injector rule that spaces these boxes out
+    // relies on text-align:justify distributing space between inline-block
+    // children, which only works if there's whitespace between them to
+    // distribute. Collapsing this to a single concatenated string with no
+    // gaps makes the boxes jam together with no spacing.
     $html = "<div class='sample-info-header'><h1>{$chemical_name_esc}</h1><p>{$description_esc}</p></div>"
       . "<div class='sample-info'>"
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>DTXSID</h2></div>"
       . "<div class='field_value'><a href='{$dtxsid_link}'>{$dtxsid_esc}</a></div>"
-      . '</div>'
+      . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Formula</h2></div>"
       . "<div class='field_value'>{$formula_esc}</div>"
-      . '</div>'
+      . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Chemical Class</h2></div>"
       . "<div class='field_value'>{$chemical_class_esc}</div>"
-      . '</div>'
+      . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_value chemical-structure'><img alt='{$chemical_name_esc}' src='{$chemical_image_url}'/></div>"
       . '</div>'
