@@ -101,7 +101,7 @@ class EnvSampOverviewChemOccurrenceChartHighchartsBlock extends BlockBase implem
     //    - Chart data passed through drupalSettings (the Drupal-safe way).
     //    - Chart init JS lives in an inline script that polls for readiness.
     // -------------------------------------------------------------------------
-    $html = "<div id='{$chart_id}' style='width:100%;height:400px;'></div>";
+    $html = "<div id='{$chart_id}' class='highcharts-light' style='width:100%;height:400px;'></div>";
 
     // Inline init script — no defer, polls until Highcharts, drupalSettings,
     // and the chart container are all ready.
@@ -128,7 +128,11 @@ class EnvSampOverviewChemOccurrenceChartHighchartsBlock extends BlockBase implem
       pointFormat: '<b>{point.y}</b> ({point.percentage:.0f}%)',
     },
     legend: {
-      enabled: false,
+      enabled: true,
+      align: 'center',
+      verticalAlign: 'bottom',
+      layout: 'horizontal',
+      symbolRadius: 6,
     },
     exporting: {
       filename: 'env-samp-overview-chem-occurrence',
@@ -142,7 +146,7 @@ class EnvSampOverviewChemOccurrenceChartHighchartsBlock extends BlockBase implem
       pie: {
         allowPointSelect: true,
         cursor: 'pointer',
-        showInLegend: false,
+        showInLegend: true,
         dataLabels: [
           {
             enabled: true,

@@ -94,7 +94,7 @@ class EnvSampOverviewTableBlock extends BlockBase implements BlockPluginInterfac
         $sort_date    = '0000-00-00';
       }
 
-      $sample_id_url         = rawurlencode($row->sample_id);
+      $sample_id_url         = rawurlencode($row->sample_id ?? '');
       $sample_number_esc     = htmlspecialchars($row->sample_number ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       $sample_name_esc       = htmlspecialchars($row->sample_name ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       $display_date_esc      = htmlspecialchars($display_date, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');

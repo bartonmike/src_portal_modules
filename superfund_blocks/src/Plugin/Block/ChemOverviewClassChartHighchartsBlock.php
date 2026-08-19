@@ -106,7 +106,7 @@ class ChemOverviewClassChartHighchartsBlock extends BlockBase implements BlockPl
       . "PCB = polychlorinated biphenyls, a group of synthetic and toxic chlorinated hydrocarbon chemicals."
       . "</div>";
 
-    $html = "<div id='{$chart_id}' style='width:100%;height:400px;'></div>"
+    $html = "<div id='{$chart_id}' class='highcharts-light' style='width:100%;height:400px;'></div>"
       . $descriptor;
 
     // Inline init script — no defer, polls until Highcharts, drupalSettings,
@@ -134,7 +134,11 @@ class ChemOverviewClassChartHighchartsBlock extends BlockBase implements BlockPl
       pointFormat: '<b>{point.y}</b> ({point.percentage:.0f}%)',
     },
     legend: {
-      enabled: false,
+      enabled: true,
+      align: 'center',
+      verticalAlign: 'bottom',
+      layout: 'horizontal',
+      symbolRadius: 6,
     },
     exporting: {
       filename: 'chem-overview-class',
@@ -148,7 +152,7 @@ class ChemOverviewClassChartHighchartsBlock extends BlockBase implements BlockPl
       pie: {
         allowPointSelect: true,
         cursor: 'pointer',
-        showInLegend: false,
+        showInLegend: true,
         dataLabels: [
           {
             enabled: true,

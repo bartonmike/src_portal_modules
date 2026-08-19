@@ -109,7 +109,7 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
     // -------------------------------------------------------------------------
     $body_rows = [];
     foreach ($rows as $row) {
-      $chemical_id_url    = rawurlencode($row->chemical_id);
+      $chemical_id_url    = rawurlencode($row->chemical_id ?? '');
       $chemical_name_esc  = htmlspecialchars($row->chemical_name ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       $cas_number_esc     = htmlspecialchars($row->cas_number ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       $chemical_class_esc = htmlspecialchars($row->chemical_class ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');

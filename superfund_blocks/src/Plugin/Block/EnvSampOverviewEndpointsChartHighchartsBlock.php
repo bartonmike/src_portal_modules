@@ -115,7 +115,7 @@ class EnvSampOverviewEndpointsChartHighchartsBlock extends BlockBase implements 
       . "platform to detect biological anomalies."
       . "</div>";
 
-    $html = "<div id='{$chart_id}' style='width:100%;height:400px;'></div>"
+    $html = "<div id='{$chart_id}' class='highcharts-light' style='width:100%;height:400px;'></div>"
       . $descriptor;
 
     // Inline init script — no defer, polls until Highcharts, drupalSettings,
@@ -142,7 +142,7 @@ class EnvSampOverviewEndpointsChartHighchartsBlock extends BlockBase implements 
     },
     yAxis: {
       min: 0,
-      title: { text: 'Count', align: 'high' },
+      title: { text: 'Count' },
     },
     tooltip: {
       pointFormat: '<b>{point.y}</b>',
