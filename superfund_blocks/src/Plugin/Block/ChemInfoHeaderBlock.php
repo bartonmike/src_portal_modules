@@ -90,6 +90,7 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
             `PREFERRED_NAME` AS chemical_name,
             `chemDescription` AS chemical_description,
             `DTXSID` AS dtxsid,
+            `cas_number` AS cas_number,
             `MOLECULAR_FORMULA` AS molecular_formula,
             `chemical_class` AS chemical_class
           FROM `view_chemicals`
@@ -115,6 +116,7 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
     $chemical_name_esc  = htmlspecialchars($row['chemical_name'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $description_esc    = htmlspecialchars($row['chemical_description'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $dtxsid_esc         = htmlspecialchars($row['dtxsid'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $cas_number_esc     = htmlspecialchars($row['cas_number'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $chemical_class_esc = htmlspecialchars($row['chemical_class'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $dtxsid_url         = rawurlencode($row['dtxsid'] ?? '');
 
@@ -136,6 +138,10 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>DTXSID</h2></div>"
       . "<div class='field_value'><a href='{$dtxsid_link}'>{$dtxsid_esc}</a></div>"
+      . '</div> '
+      . "<div class='info-box'>"
+      . "<div class='field_label'><h2>CAS Number</h2></div>"
+      . "<div class='field_value'>{$cas_number_esc}</div>"
       . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Formula</h2></div>"
