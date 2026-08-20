@@ -109,7 +109,11 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
     // -------------------------------------------------------------------------
     $body_rows = [];
     foreach ($rows as $row) {
-      $chemical_id_url    = rawurlencode($row->chemical_id ?? '');
+      // Link by the human-readable CAS number when available, falling back
+      // to the internal Chemical_ID for the rare chemical without one.
+      $chemical_link_url = !empty($row->cas_number)
+        ? '/chemicals/view?cas=' . rawurlencode($row->cas_number)
+        : '/chemicals/view?id=' . rawurlencode($row->chemical_id ?? '');
       $chemical_name_esc  = htmlspecialchars($row->chemical_name ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       $cas_number_esc     = htmlspecialchars($row->cas_number ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       $chemical_class_esc = htmlspecialchars($row->chemical_class ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -117,7 +121,7 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
       $endpoints_esc      = htmlspecialchars($row->data_flags ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
       $body_rows[] = "<tr>"
-        . "<td><a href='/chemicals/view?id={$chemical_id_url}'>{$chemical_name_esc}</a></td>"
+        . "<td><a href='{$chemical_link_url}'>{$chemical_name_esc}</a></td>"
         . "<td>{$cas_number_esc}</td>"
         . "<td>{$chemical_class_esc}</td>"
         . "<td>{$sample_count_esc}</td>"

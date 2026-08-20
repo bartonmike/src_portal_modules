@@ -6,6 +6,7 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\superfund_blocks\ChemicalIdResolverTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -13,9 +14,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * Provides a Chemical Zebrafish BMD Dose-Response chart block.
  *
  * Displays a Plotly concentration-response curve (fitted line + dose-response
- * scatter with error bars) for a chemical identified by the ?id= query
- * parameter. A chemical can have multiple zebrafish endpoints; all of their
- * datasets are loaded up front and exposed on
+ * scatter with error bars) for a chemical identified by the ?id= or ?cas=
+ * query parameter. A chemical can have multiple zebrafish endpoints; all of
+ * their datasets are loaded up front and exposed on
  * window.superfundBlocks.chemZfBmdResp['<chart_id>'](endpointKey) so a
  * companion endpoint-selector block can switch which one is displayed
  * without any further server round-trip.
@@ -27,6 +28,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * )
  */
 class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
+
+  use ChemicalIdResolverTrait;
 
   /**
    * Decimal places to round AUC/BMD10/BMD50 to for display.
@@ -154,13 +157,12 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
    */
   public function build(): array {
     // -------------------------------------------------------------------------
-    // 1. Get and validate ?id= query parameter.
+    // 1. Resolve the chemical from ?cas= or ?id=.
     // -------------------------------------------------------------------------
     $request      = $this->requestStack->getCurrentRequest();
-    $raw_id       = $request->query->get('id', '');
-    $sanitized_id = preg_replace('/[^0-9\-]/', '', $raw_id);
+    $sanitized_id = $this->resolveChemicalId($request);
 
-    if (!preg_match('/^\d+(-\d+)?$/', $sanitized_id)) {
+    if ($sanitized_id === NULL) {
       return ['#markup' => ''];
     }
 
@@ -541,7 +543,7 @@ JS;
         ],
       ],
       '#cache' => [
-        'contexts' => ['url.query_args:id'],
+        'contexts' => ['url.query_args:id', 'url.query_args:cas'],
       ],
     ];
   }

@@ -6,6 +6,7 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\superfund_blocks\ChemicalIdResolverTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -13,8 +14,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * Provides a Chemical Environment Water Concentration chart block.
  *
  * Displays a Plotly bar chart of PSD-Water/PSD-Air environment
- * concentrations for a chemical identified by the ?id= query parameter.
- * Bars and x-axis labels link through to the sample detail page.
+ * concentrations for a chemical identified by the ?id= or ?cas= query
+ * parameter. Bars and x-axis labels link through to the sample detail page.
  *
  * @Block(
  *   id = "superfund_blocks_chem_env_water_conc_chart",
@@ -23,6 +24,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * )
  */
 class ChemEnvWaterConcChartBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
+
+  use ChemicalIdResolverTrait;
 
   /**
    * The database connection.
@@ -71,32 +74,17 @@ class ChemEnvWaterConcChartBlock extends BlockBase implements BlockPluginInterfa
    */
   public function build(): array {
     // -------------------------------------------------------------------------
-    // 1. Get and validate ?id= query parameter.
+    // 1. Resolve the chemical from ?cas= or ?id=.
     // -------------------------------------------------------------------------
     $request      = $this->requestStack->getCurrentRequest();
-    $raw_id       = $request->query->get('id', '');
-    $sanitized_id = preg_replace('/[^0-9\-]/', '', $raw_id);
+    $sanitized_id = $this->resolveChemicalId($request);
 
-    if (!preg_match('/^\d+(-\d+)?$/', $sanitized_id)) {
+    if ($sanitized_id === NULL) {
       return ['#markup' => ''];
     }
 
     // -------------------------------------------------------------------------
-    // 2. Confirm the chemical exists.
-    // -------------------------------------------------------------------------
-    $count = (int) $this->database
-      ->query(
-        'SELECT COUNT(`Chemical_ID`) AS count FROM view_chemicals WHERE Chemical_ID = :chem_id',
-        [':chem_id' => $sanitized_id]
-      )
-      ->fetchField();
-
-    if ($count <= 0) {
-      return ['#markup' => ''];
-    }
-
-    // -------------------------------------------------------------------------
-    // 3. Fetch concentration data.
+    // 2. Fetch concentration data.
     // -------------------------------------------------------------------------
     $sql = "SELECT DISTINCT
         CASE
@@ -129,7 +117,7 @@ class ChemEnvWaterConcChartBlock extends BlockBase implements BlockPluginInterfa
     }
 
     // -------------------------------------------------------------------------
-    // 4. Build data arrays for Plotly.
+    // 3. Build data arrays for Plotly.
     // -------------------------------------------------------------------------
     $sample_names = [];
     $sample_ids   = [];
@@ -172,7 +160,7 @@ class ChemEnvWaterConcChartBlock extends BlockBase implements BlockPluginInterfa
     $chart_id = 'chart-chem-env-water-conc-' . $sanitized_id;
 
     // -------------------------------------------------------------------------
-    // 5. Build the render array.
+    // 4. Build the render array.
     //    - Plotly CDN loaded via html_head (no defer — causes race conditions).
     //    - Chart data passed through drupalSettings (the Drupal-safe way).
     //    - Chart init JS lives in an inline script that waits for
@@ -360,7 +348,7 @@ JS;
         ],
       ],
       '#cache' => [
-        'contexts' => ['url.query_args:id'],
+        'contexts' => ['url.query_args:id', 'url.query_args:cas'],
       ],
     ];
   }

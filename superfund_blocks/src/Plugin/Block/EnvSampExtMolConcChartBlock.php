@@ -101,6 +101,7 @@ class EnvSampExtMolConcChartBlock extends BlockBase implements BlockPluginInterf
     $sql = "SELECT DISTINCT
         vc.Chemical_ID,
         vc.PREFERRED_NAME,
+        vc.cas_number,
         vstc.measurement_value_molar,
         vstc.measurement_value_molar_unit
       FROM view_samplesToChemicals vstc
@@ -124,6 +125,7 @@ class EnvSampExtMolConcChartBlock extends BlockBase implements BlockPluginInterf
     // -------------------------------------------------------------------------
     $chemical_ids   = [];
     $chemical_names = [];
+    $chemical_cas   = [];
     $values         = [];
     $unit           = '';
 
@@ -131,6 +133,7 @@ class EnvSampExtMolConcChartBlock extends BlockBase implements BlockPluginInterf
     foreach ($rows as $row) {
       $chemical_ids[]   = $row->Chemical_ID;
       $chemical_names[] = $row->PREFERRED_NAME;
+      $chemical_cas[]   = $row->cas_number ?? '';
       // NOTE: original code cast to int — change to (float) if you need decimals.
       $values[]         = (int) $row->measurement_value_molar;
       $unit             = $row->measurement_value_molar_unit;
@@ -176,13 +179,23 @@ class EnvSampExtMolConcChartBlock extends BlockBase implements BlockPluginInterf
   var settings      = drupalSettings.superfundBlocks.envSampExtMolConc['{$chart_id}'];
   var chemicalNames = settings.chemicalNames;
   var chemicalIds   = settings.chemicalIds;
+  var chemicalCas   = settings.chemicalCas;
   var values        = settings.values;
   var unit          = settings.unit;
   var csvRows       = settings.csvRows;
 
+  // Prefer linking by the human-readable CAS number; fall back to the
+  // internal Chemical_ID for the rare chemical without one.
+  function chemicalUrl(i) {
+    var cas = chemicalCas[i];
+    return cas
+      ? '/chemicals/view?cas=' + encodeURIComponent(cas)
+      : '/chemicals/view?id=' + encodeURIComponent(chemicalIds[i]);
+  }
+
   // Navigate to a chemical's detail page.
-  function goToChemical(chemId) {
-    window.location.href = '/chemicals/view?id=' + encodeURIComponent(chemId);
+  function goToChemical(i) {
+    window.location.href = chemicalUrl(i);
   }
 
   // ---- CSV download ---------------------------------------------------------
@@ -208,8 +221,7 @@ class EnvSampExtMolConcChartBlock extends BlockBase implements BlockPluginInterf
 
   // ---- Chart ---------------------------------------------------------------
   var tickText = chemicalNames.map(function (name, i) {
-    var chemUrl = '/chemicals/view?id=' + encodeURIComponent(chemicalIds[i]);
-    var finalChemUrl = `<a href="\${chemUrl}">\${name}</a>`;
+    var finalChemUrl = `<a href="\${chemicalUrl(i)}">\${name}</a>`;
     return finalChemUrl;
   });
 
@@ -273,7 +285,7 @@ class EnvSampExtMolConcChartBlock extends BlockBase implements BlockPluginInterf
     Plotly.newPlot(chartDiv, [trace], layout, config);
 
     chartDiv.on('plotly_click', function (data) {
-      goToChemical(chemicalIds[data.points[0].pointIndex]);
+      goToChemical(data.points[0].pointIndex);
     });
   }
 
@@ -305,6 +317,7 @@ JS;
               $chart_id => [
                 'chemicalNames' => $chemical_names,
                 'chemicalIds'   => $chemical_ids,
+                'chemicalCas'   => $chemical_cas,
                 'values'        => $values,
                 'unit'          => $unit,
                 'csvRows'       => $csv_rows,

@@ -6,6 +6,7 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\superfund_blocks\ChemicalIdResolverTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -13,8 +14,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * Provides a Chemical Human Gene Expression Table block.
  *
  * Static summary table (not a graph selector) showing, for a chemical
- * identified by the ?id= query parameter, how many conditions were tested
- * in each of the three human cell lines (HEPG2, MCF10A, ADIPO).
+ * identified by the ?id= or ?cas= query parameter, how many conditions were
+ * tested in each of the three human cell lines (HEPG2, MCF10A, ADIPO).
  *
  * @Block(
  *   id = "superfund_blocks_chem_gene_exp_table",
@@ -23,6 +24,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * )
  */
 class ChemGeneExpTableBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
+
+  use ChemicalIdResolverTrait;
 
   /**
    * The cell-line projects shown, in display order.
@@ -76,13 +79,12 @@ class ChemGeneExpTableBlock extends BlockBase implements BlockPluginInterface, C
    */
   public function build(): array {
     // -------------------------------------------------------------------------
-    // 1. Get and validate ?id= query parameter.
+    // 1. Resolve the chemical from ?cas= or ?id=.
     // -------------------------------------------------------------------------
     $request      = $this->requestStack->getCurrentRequest();
-    $raw_id       = $request->query->get('id', '');
-    $sanitized_id = preg_replace('/[^0-9\-]/', '', $raw_id);
+    $sanitized_id = $this->resolveChemicalId($request);
 
-    if (!preg_match('/^\d+(-\d+)?$/', $sanitized_id)) {
+    if ($sanitized_id === NULL) {
       return ['#markup' => ''];
     }
 
@@ -221,7 +223,7 @@ JS;
         ],
       ],
       '#cache' => [
-        'contexts' => ['url.query_args:id'],
+        'contexts' => ['url.query_args:id', 'url.query_args:cas'],
       ],
     ];
   }

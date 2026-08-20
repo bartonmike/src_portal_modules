@@ -6,6 +6,7 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\superfund_blocks\ChemicalIdResolverTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -13,8 +14,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * Provides the Chemical Info Header block.
  *
  * Displays the name, description, DTXSID, molecular formula, chemical class,
- * and structure image for the chemical identified by the ?id= query
- * parameter. Meant to sit above the other chemical-page blocks.
+ * and structure image for the chemical identified by the ?id= or ?cas=
+ * query parameter. Meant to sit above the other chemical-page blocks.
  *
  * @Block(
  *   id = "superfund_blocks_chem_info_header",
@@ -23,6 +24,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * )
  */
 class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
+
+  use ChemicalIdResolverTrait;
 
   /**
    * The database connection.
@@ -71,14 +74,13 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
    */
   public function build(): array {
     // -------------------------------------------------------------------------
-    // 1. Get and validate ?id= query parameter.
+    // 1. Resolve the chemical from ?cas= or ?id=.
     // -------------------------------------------------------------------------
     $request      = $this->requestStack->getCurrentRequest();
-    $raw_id       = $request->query->get('id', '');
-    $sanitized_id = preg_replace('/[^0-9\-]/', '', $raw_id);
+    $sanitized_id = $this->resolveChemicalId($request);
 
     $row = NULL;
-    if (preg_match('/^\d+(-\d+)?$/', $sanitized_id)) {
+    if ($sanitized_id !== NULL) {
       // -------------------------------------------------------------------------
       // 2. Fetch the chemical's info.
       // -------------------------------------------------------------------------
@@ -103,7 +105,7 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
         '#markup' => "<div class='sample-info-header'><h1>Chemical Information</h1>"
           . "<p>We couldn't find that Chemical ID, try <a href='/chemicals'>selecting it again</a>, "
           . "otherwise <a href='/contact-us'>contact us</a> if this is in error.</p></div>",
-        '#cache' => ['contexts' => ['url.query_args:id']],
+        '#cache' => ['contexts' => ['url.query_args:id', 'url.query_args:cas']],
       ];
     }
 
@@ -151,7 +153,7 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
     return [
       '#markup' => $html,
       '#cache'  => [
-        'contexts' => ['url.query_args:id'],
+        'contexts' => ['url.query_args:id', 'url.query_args:cas'],
       ],
     ];
   }

@@ -6,6 +6,7 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\superfund_blocks\ChemicalIdResolverTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -19,6 +20,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * to switch which endpoint's concentration-response curve is displayed,
  * without a page reload. Both blocks derive the same chart_id from the
  * chemical id, so they only need to be placed on the same chemical page.
+ * The chemical is identified by the ?id= or ?cas= query parameter.
  *
  * @Block(
  *   id = "superfund_blocks_chem_zf_bmd_selector_table",
@@ -27,6 +29,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * )
  */
 class ChemZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
+
+  use ChemicalIdResolverTrait;
 
   /**
    * The database connection.
@@ -113,13 +117,12 @@ class ChemZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInterf
    */
   public function build(): array {
     // -------------------------------------------------------------------------
-    // 1. Get and validate ?id= query parameter.
+    // 1. Resolve the chemical from ?cas= or ?id=.
     // -------------------------------------------------------------------------
     $request      = $this->requestStack->getCurrentRequest();
-    $raw_id       = $request->query->get('id', '');
-    $sanitized_id = preg_replace('/[^0-9\-]/', '', $raw_id);
+    $sanitized_id = $this->resolveChemicalId($request);
 
-    if (!preg_match('/^\d+(-\d+)?$/', $sanitized_id)) {
+    if ($sanitized_id === NULL) {
       return ['#markup' => ''];
     }
 
@@ -314,7 +317,7 @@ JS;
         ],
       ],
       '#cache' => [
-        'contexts' => ['url.query_args:id'],
+        'contexts' => ['url.query_args:id', 'url.query_args:cas'],
       ],
     ];
   }
