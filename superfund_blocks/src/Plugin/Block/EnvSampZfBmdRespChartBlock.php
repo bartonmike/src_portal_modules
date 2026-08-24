@@ -440,12 +440,11 @@ class EnvSampZfBmdRespChartBlock extends BlockBase implements BlockPluginInterfa
 
     var lineTrace = {
       type: 'scatter',
-      mode: 'lines+markers',
+      mode: 'lines',
       name: 'Fitted Curve',
       x: dataset.line.map(function (p) { return p.x; }),
       y: dataset.line.map(function (p) { return p.y; }),
       line: { color: '#7cb5ec', width: 2 },
-      marker: { color: '#7cb5ec', size: 5 },
     };
 
     var scatterTrace = {
