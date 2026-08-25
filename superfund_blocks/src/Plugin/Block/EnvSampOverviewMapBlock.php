@@ -207,6 +207,7 @@ JS;
       ],
       '#cache' => [
         'contexts' => [],
+        'max-age'  => 0,
       ],
     ];
   }
