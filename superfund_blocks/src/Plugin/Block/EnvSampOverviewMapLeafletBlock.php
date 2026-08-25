@@ -116,19 +116,20 @@ class EnvSampOverviewMapLeafletBlock extends BlockBase implements BlockPluginInt
     // Inline init script — no defer, polls until Leaflet, drupalSettings,
     // and the map container are all ready.
     $js = <<<JS
+// Snapshot Leaflet immediately, as the very first statement — our
+// leaflet.js <script> tag (no defer/async) is guaranteed to have fully run,
+// real window.L assignment and all, before this script block even starts.
+// Capturing it right now, unconditionally, means it's correct regardless
+// of what any later-loading script on the page does to window.L afterward
+// (this site has another script that declares a conflicting global "L").
+var Leaflet = L;
+
 (function init() {
-  // Check L.tileLayer, not just typeof L — something else on the page may
-  // stake a claim on the global "L" before or while Leaflet is still
-  // loading, and we'd otherwise latch onto that instead of the real thing.
-  if (typeof L === 'undefined' || typeof L.tileLayer !== 'function' || typeof drupalSettings === 'undefined' || !document.getElementById('{$chart_id}')) {
+  if (typeof drupalSettings === 'undefined' || !document.getElementById('{$chart_id}')) {
     setTimeout(init, 50);
     return;
   }
 
-  // Snapshot Leaflet now, the instant it's confirmed real — if something
-  // else reassigns window.L later (e.g. a theme script loading after ours),
-  // renderMap() below still has the correct reference.
-  var Leaflet  = L;
   var mapDiv   = document.getElementById('{$chart_id}');
   var settings = drupalSettings.superfundBlocks.envSampOverviewMapLeaflet['{$chart_id}'];
 
