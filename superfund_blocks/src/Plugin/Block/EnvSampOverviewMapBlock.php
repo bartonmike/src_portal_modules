@@ -63,11 +63,7 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
     // -------------------------------------------------------------------------
     $sql = "SELECT DISTINCT
         LocationName AS location,
-        CASE
-          WHEN LocationAlternateDescription = 'NULL' THEN ''
-          WHEN LocationAlternateDescription = 'NA' THEN ''
-          ELSE LocationAlternateDescription
-        END AS description,
+        projectName  AS project_name,
         LocationLat AS lat,
         LocationLon AS `long`
       FROM view_samples
@@ -84,12 +80,12 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
     $texts = [];
 
     foreach ($rows as $row) {
-      $location    = htmlspecialchars($row->location ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-      $description = htmlspecialchars($row->description ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+      $location     = htmlspecialchars($row->location ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+      $project_name = htmlspecialchars($row->project_name ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
       $lats[]  = (float) $row->lat;
       $lons[]  = (float) $row->long;
-      $texts[] = $description !== '' ? "<b>{$location}</b><br>{$description}" : "<b>{$location}</b>";
+      $texts[] = $project_name !== '' ? "<b>{$location}</b><br>{$project_name}" : "<b>{$location}</b>";
     }
 
     $chart_id = 'chart-env-samp-overview-map';
@@ -132,7 +128,8 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
     text: settings.texts,
     hovertemplate: '%{text}<extra></extra>',
     mode: 'markers',
-    marker: { size: 10, color: '#d62728' },
+    // Pin-shaped icon + blue to roughly match the Leaflet map's default marker look.
+    marker: { size: 14, symbol: 'marker', color: '#3388ff' },
   };
 
   var layout = {
@@ -147,7 +144,7 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
   var config = {
     responsive: true,
     displayModeBar: true,
-    modeBarButtonsToRemove: ['pan2d', 'select2d', 'resetScale2d', 'lasso2d', 'zoomOut2d'],
+    modeBarButtonsToRemove: ['pan2d', 'select2d', 'resetScale2d', 'lasso2d', 'zoomOut2d', 'toImage'],
   };
 
   function renderMap() {
