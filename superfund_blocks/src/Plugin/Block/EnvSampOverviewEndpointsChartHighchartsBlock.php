@@ -221,7 +221,7 @@ JS;
               '#tag'        => 'script',
               '#attributes' => ['src' => 'https://code.highcharts.com/highcharts.js'],
             ],
-            'highcharts_cdn_env_samp_overview_endpoints',
+            'highcharts_cdn',
           ],
           [
             [
@@ -229,7 +229,7 @@ JS;
               '#tag'        => 'script',
               '#attributes' => ['src' => 'https://code.highcharts.com/modules/exporting.js'],
             ],
-            'highcharts_exporting_cdn_env_samp_overview_endpoints',
+            'highcharts_exporting_cdn',
           ],
           // export-data adds the "Download CSV/XLS" items to the export menu.
           [
@@ -238,7 +238,7 @@ JS;
               '#tag'        => 'script',
               '#attributes' => ['src' => 'https://code.highcharts.com/modules/export-data.js'],
             ],
-            'highcharts_export_data_cdn_env_samp_overview_endpoints',
+            'highcharts_export_data_cdn',
           ],
           [
             [
@@ -246,7 +246,7 @@ JS;
               '#tag'        => 'script',
               '#attributes' => ['src' => 'https://code.highcharts.com/modules/accessibility.js'],
             ],
-            'highcharts_accessibility_cdn_env_samp_overview_endpoints',
+            'highcharts_accessibility_cdn',
           ],
           // Inline init script — no defer, polls for Highcharts readiness.
           [
