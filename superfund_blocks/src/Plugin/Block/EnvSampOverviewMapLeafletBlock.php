@@ -117,29 +117,36 @@ class EnvSampOverviewMapLeafletBlock extends BlockBase implements BlockPluginInt
     // and the map container are all ready.
     $js = <<<JS
 (function init() {
-  if (typeof L === 'undefined' || typeof drupalSettings === 'undefined' || !document.getElementById('{$chart_id}')) {
+  // Check L.tileLayer, not just typeof L — something else on the page may
+  // stake a claim on the global "L" before or while Leaflet is still
+  // loading, and we'd otherwise latch onto that instead of the real thing.
+  if (typeof L === 'undefined' || typeof L.tileLayer !== 'function' || typeof drupalSettings === 'undefined' || !document.getElementById('{$chart_id}')) {
     setTimeout(init, 50);
     return;
   }
 
+  // Snapshot Leaflet now, the instant it's confirmed real — if something
+  // else reassigns window.L later (e.g. a theme script loading after ours),
+  // renderMap() below still has the correct reference.
+  var Leaflet  = L;
   var mapDiv   = document.getElementById('{$chart_id}');
   var settings = drupalSettings.superfundBlocks.envSampOverviewMapLeaflet['{$chart_id}'];
 
   function renderMap() {
-    var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    var osm = Leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap',
     });
 
     var markers = settings.locations.map(function (loc) {
-      return L.marker([loc.lat, loc.lon])
+      return Leaflet.marker([loc.lat, loc.lon])
         .bindPopup(loc.popup)
         .bindTooltip(loc.label, { permanent: false });
     });
 
-    var samplingLocations = L.layerGroup(markers);
+    var samplingLocations = Leaflet.layerGroup(markers);
 
-    var map = L.map(mapDiv, {
+    var map = Leaflet.map(mapDiv, {
       center: [44.08, -103.23],
       zoom: 3,
       layers: [osm, samplingLocations],
