@@ -144,6 +144,7 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
   };
 
   var layout = {
+    showlegend: false,
     map: {
       style: 'open-street-map',
       center: { lat: 44.08, lon: -103.23 },
