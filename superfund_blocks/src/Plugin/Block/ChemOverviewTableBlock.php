@@ -162,6 +162,63 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
     initComplete: function () {
       var api = this.api();
 
+      // ---- Punctuation-agnostic global search --------------------------
+      // Strips punctuation/dashes/spaces/brackets/parens from both the
+      // typed search value and each row's text, then requires every
+      // resulting piece to appear somewhere in the row (AND, not OR) — so
+      // "50-00-0", "50 00 0", and "500 0" all find the same CAS number.
+      var searchTokens = [];
+
+      function stripHtml(v) {
+        if (v == null) {
+          return '';
+        }
+        var tmp = document.createElement('div');
+        tmp.innerHTML = String(v);
+        return (tmp.textContent || tmp.innerText || '').trim();
+      }
+
+      function tokenize(str) {
+        var normalized = String(str)
+          .toLowerCase()
+          .replace(/[.,\/#!$%\^&*;:{}=\-_`~()\[\]<>'"?]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        return normalized === '' ? [] : normalized.split(' ');
+      }
+
+      DataTable.ext.search.push(function (settings, data) {
+        if (settings.nTable.id !== 'chemicals_table' || !searchTokens.length) {
+          return true;
+        }
+        var haystack = tokenize(data.map(stripHtml).join(' ')).join(' ');
+        return searchTokens.every(function (token) {
+          return haystack.indexOf(token) !== -1;
+        });
+      });
+
+      var searchInput = document.querySelector('#chemicals_table_wrapper input[type="search"]');
+      if (searchInput) {
+        // Replace the input to drop DataTables' own keyup listener — we
+        // want our tokenized matching to be the only thing filtering,
+        // not stacked on top of the default substring search.
+        var freshInput = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(freshInput, searchInput);
+
+        var termsDisplay = document.createElement('div');
+        termsDisplay.className = 'search-terms-display';
+        termsDisplay.style.cssText = 'margin-top:4px;font-size:0.85em;color:#555;';
+        freshInput.closest('div').insertAdjacentElement('afterend', termsDisplay);
+
+        freshInput.addEventListener('input', function () {
+          searchTokens = tokenize(this.value);
+          termsDisplay.textContent = searchTokens.length
+            ? 'Searching for: ' + searchTokens.join(', ')
+            : '';
+          api.draw();
+        });
+      }
+
       // Filters needed: Chemical Class (col 2), Endpoints (col 4).
       // No filters for Chemical Name, CAS, Sample Count.
       var filterCols = [2, 4];

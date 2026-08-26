@@ -138,14 +138,17 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
     type: 'scattermap',
     lat: settings.lats,
     lon: settings.lons,
-    text: settings.texts,
-    hovertemplate: '%{text}<extra></extra>',
     mode: 'markers',
+    hoverinfo: 'skip',
     marker: { size: 6, color: '#ffffff' },
   };
 
   var layout = {
     showlegend: false,
+    // Both traces share coordinates — pin hovermode to 'closest' so Plotly
+    // resolves a single hover target instead of surfacing both traces'
+    // (would-be) labels for the same point.
+    hovermode: 'closest',
     map: {
       style: 'open-street-map',
       center: { lat: 44.08, lon: -103.23 },

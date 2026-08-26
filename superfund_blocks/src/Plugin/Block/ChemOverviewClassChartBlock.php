@@ -97,13 +97,14 @@ class ChemOverviewClassChartBlock extends BlockBase implements BlockPluginInterf
     //      DOMContentLoaded.
     // -------------------------------------------------------------------------
     $descriptor = "<div class='chem-overview-class-plot element-descriptor'>"
-      . "<strong>Chemical Classes:</strong> The count of studied chemicals per category. "
+      . "The count of studied chemicals per category. "
       . "PFAS = per- and polyfluoroalkyl substances, colloquially known as \"forever chemicals\". "
       . "PAH = polycyclic aromatic hydrocarbons, formed during incomplete burning. "
       . "PCB = polychlorinated biphenyls, a group of synthetic and toxic chlorinated hydrocarbon chemicals."
       . "</div>";
 
-    $html = "<div id='{$chart_id}' style='width:100%;height:400px;'></div>"
+    $html = "<h2>Chemicals Measured</h2>"
+      . "<div id='{$chart_id}' style='width:100%;height:400px;'></div>"
       . $descriptor;
 
     // Inline init script — no defer, wraps itself in DOMContentLoaded so it

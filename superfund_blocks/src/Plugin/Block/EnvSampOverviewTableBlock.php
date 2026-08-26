@@ -168,6 +168,19 @@ class EnvSampOverviewTableBlock extends BlockBase implements BlockPluginInterfac
   var selectedTech     = [];
   var selectedTests    = [];
 
+  // Punctuation-agnostic global search state — see the ext.search.push
+  // below for how this gets applied.
+  var searchTokens = [];
+
+  function tokenizeSearch(str) {
+    var normalized = String(str)
+      .toLowerCase()
+      .replace(/[.,\/#!$%\^&*;:{}=\-_`~()\[\]<>'"?]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return normalized === '' ? [] : normalized.split(' ');
+  }
+
   // Shows/hides every .filters row on the page by class, based on computed
   // style (not just this table's — matches the filter-toggle behavior used
   // elsewhere on the site).
@@ -236,6 +249,21 @@ class EnvSampOverviewTableBlock extends BlockBase implements BlockPluginInterfac
     return true;
   });
 
+  // Punctuation-agnostic global search: strips punctuation/dashes/spaces/
+  // brackets/parens from both the typed value and each row's text, then
+  // requires every resulting piece to appear somewhere in the row (AND,
+  // not OR) — so "50-00-0", "50 00 0", and "500 0" all match the same
+  // CAS number. Only applies to this table.
+  DataTable.ext.search.push(function (settings, data) {
+    if (settings.nTable.id !== 'sample_locations' || !searchTokens.length) {
+      return true;
+    }
+    var haystack = tokenizeSearch(data.map(stripHtml).join(' ')).join(' ');
+    return searchTokens.every(function (token) {
+      return haystack.indexOf(token) !== -1;
+    });
+  });
+
   function buildUniqueOptionsFromColumn(column) {
     var seen = [];
     column.data().each(function (d) {
@@ -269,6 +297,28 @@ class EnvSampOverviewTableBlock extends BlockBase implements BlockPluginInterfac
     ],
     initComplete: function () {
       var api = this.api();
+
+      var searchInput = document.querySelector('#sample_locations_wrapper input[type="search"]');
+      if (searchInput) {
+        // Replace the input to drop DataTables' own keyup listener — we
+        // want our tokenized matching to be the only thing filtering,
+        // not stacked on top of the default substring search.
+        var freshInput = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(freshInput, searchInput);
+
+        var termsDisplay = document.createElement('div');
+        termsDisplay.className = 'search-terms-display';
+        termsDisplay.style.cssText = 'margin-top:4px;font-size:0.85em;color:#555;';
+        freshInput.closest('div').insertAdjacentElement('afterend', termsDisplay);
+
+        freshInput.addEventListener('input', function () {
+          searchTokens = tokenizeSearch(this.value);
+          termsDisplay.textContent = searchTokens.length
+            ? 'Searching for: ' + searchTokens.join(', ')
+            : '';
+          api.draw();
+        });
+      }
 
       // Delegated on the table itself rather than a direct reference to the
       // button — DataTables can rebuild/rewrap header cells during init,
