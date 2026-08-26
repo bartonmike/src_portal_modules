@@ -121,15 +121,26 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
   var chartDiv = document.getElementById('{$chart_id}');
   var settings = drupalSettings.superfundBlocks.envSampOverviewMap['{$chart_id}'];
 
-  var trace = {
+  // Plotly's built-in "marker" symbol icon renders as a flat black
+  // silhouette and ignores marker.color, so instead we fake a pin look
+  // with two overlaid circles: a blue outer dot plus a small white center.
+  var outerTrace = {
     type: 'scattermap',
     lat: settings.lats,
     lon: settings.lons,
     text: settings.texts,
     hovertemplate: '%{text}<extra></extra>',
     mode: 'markers',
-    // Pin-shaped icon + blue to roughly match the Leaflet map's default marker look.
-    marker: { size: 14, symbol: 'marker', color: '#3388ff' },
+    marker: { size: 16, color: '#3388ff' },
+  };
+
+  var centerTrace = {
+    type: 'scattermap',
+    lat: settings.lats,
+    lon: settings.lons,
+    mode: 'markers',
+    hoverinfo: 'skip',
+    marker: { size: 6, color: '#ffffff' },
   };
 
   var layout = {
@@ -148,7 +159,7 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
   };
 
   function renderMap() {
-    Plotly.newPlot(chartDiv, [trace], layout, config);
+    Plotly.newPlot(chartDiv, [outerTrace, centerTrace], layout, config);
   }
 
   if (chartDiv.offsetWidth !== 0) {
