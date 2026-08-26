@@ -138,8 +138,9 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
     type: 'scattermap',
     lat: settings.lats,
     lon: settings.lons,
+    text: settings.texts,
+    hovertemplate: '%{text}<extra></extra>',
     mode: 'markers',
-    hoverinfo: 'skip',
     marker: { size: 6, color: '#ffffff' },
   };
 
