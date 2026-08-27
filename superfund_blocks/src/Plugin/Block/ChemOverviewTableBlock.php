@@ -179,9 +179,13 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
       }
 
       function tokenize(str) {
+        // \x26/\x3c/\x3e (&, <, >) instead of the literal characters —
+        // this site's rendering pipeline HTML-entity-encodes bare &, <, >
+        // inside inline <script> content, which would otherwise turn this
+        // into a character class containing stray a/m/p/l/t/g letters.
         var normalized = String(str)
           .toLowerCase()
-          .replace(/[.,\/#!$%\^&*;:{}=\-_`~()\[\]<>'"?]/g, ' ')
+          .replace(/[.,\/#!$%\^\x26*;:{}=\-_`~()\[\]\x3c\x3e'"?]/g, ' ')
           .replace(/\s+/g, ' ')
           .trim();
         return normalized === '' ? [] : normalized.split(' ');
