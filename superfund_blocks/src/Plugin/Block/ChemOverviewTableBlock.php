@@ -185,7 +185,7 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
         // into a character class containing stray a/m/p/l/t/g letters.
         var normalized = String(str)
           .toLowerCase()
-          .replace(/[.,\/#!$%\^\x26*;:{}=\-_`~()\[\]\x3c\x3e'"?]/g, ' ')
+          .replace(/[.,\/#!$%\^*;:{}=\-_`~()\[\]'"?]/g, ' ')
           .replace(/\s+/g, ' ')
           .trim();
         return normalized === '' ? [] : normalized.split(' ');
