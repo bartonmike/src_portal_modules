@@ -100,11 +100,11 @@ class ChemExtMolConcChartBlock extends BlockBase implements BlockPluginInterface
         JOIN view_samples   vs ON vs.Sample_ID   = vstc.Sample_ID
       WHERE
         (vs.sample_matrix = 'PSD-Water' OR vs.sample_matrix = 'PSD-Air')
-        AND vstc.environment_concentration != 0
-        AND vstc.environment_concentration IS NOT NULL
+        AND vstc.environmental_concentration != 0
+        AND vstc.environmental_concentration IS NOT NULL
         AND vstc.Chemical_ID = :chem_id
-        AND (vstc.environment_concentration_qualifier != 'U'
-             OR vstc.environment_concentration_qualifier IS NULL)
+        AND (vstc.environmental_concentration_qualifier != 'U'
+             OR vstc.environmental_concentration_qualifier IS NULL)
       ORDER BY vstc.measurement_value_molar DESC";
 
     $rows = $this->database

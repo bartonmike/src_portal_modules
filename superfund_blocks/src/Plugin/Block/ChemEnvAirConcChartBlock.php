@@ -93,20 +93,20 @@ class ChemEnvAirConcChartBlock extends BlockBase implements BlockPluginInterface
           ELSE vs.Sample_ID
         END AS SampleName,
         vs.Sample_ID,
-        vstc.environment_concentration,
-        vstc.environment_concentration_unit
+        vstc.environmental_concentration,
+        vstc.environmental_concentration_unit
       FROM view_samplesToChemicals vstc
         JOIN view_chemicals vc ON vc.Chemical_ID = vstc.Chemical_ID
         JOIN view_samples   vs ON vs.Sample_ID   = vstc.Sample_ID
       WHERE
         (vs.sample_matrix = 'PSD-Water' OR vs.sample_matrix = 'PSD-Air')
-        AND vstc.environment_concentration != 0
-        AND vstc.environment_concentration IS NOT NULL
+        AND vstc.environmental_concentration != 0
+        AND vstc.environmental_concentration IS NOT NULL
         AND vstc.Chemical_ID = :chem_id
-        AND (vstc.environment_concentration_qualifier != 'U'
-             OR vstc.environment_concentration_qualifier IS NULL)
-        AND vstc.environment_concentration_unit IN ('ng/m3', 'ng/m^3', 'ng/m³')
-      ORDER BY vstc.environment_concentration DESC";
+        AND (vstc.environmental_concentration_qualifier != 'U'
+             OR vstc.environmental_concentration_qualifier IS NULL)
+        AND vstc.environmental_concentration_unit IN ('ng/m3', 'ng/m^3', 'ng/m³')
+      ORDER BY vstc.environmental_concentration DESC";
 
     $rows = $this->database
       ->query($sql, [':chem_id' => $sanitized_id])
@@ -128,14 +128,14 @@ class ChemEnvAirConcChartBlock extends BlockBase implements BlockPluginInterface
     foreach ($rows as $row) {
       $sample_names[] = $row->SampleName;
       $sample_ids[]   = $row->Sample_ID;
-      $values[]       = (float) $row->environment_concentration;
-      $unit           = $row->environment_concentration_unit;
+      $values[]       = (float) $row->environmental_concentration;
+      $unit           = $row->environmental_concentration_unit;
       // Full row data for CSV download.
       $csv_rows[] = [
         'sample_name'   => $row->SampleName,
         'sample_id'     => $row->Sample_ID,
-        'concentration' => $row->environment_concentration,
-        'unit'          => $row->environment_concentration_unit,
+        'concentration' => $row->environmental_concentration,
+        'unit'          => $row->environmental_concentration_unit,
       ];
     }
 

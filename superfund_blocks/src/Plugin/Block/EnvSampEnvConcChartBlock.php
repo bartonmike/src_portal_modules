@@ -103,17 +103,17 @@ class EnvSampEnvConcChartBlock extends BlockBase implements BlockPluginInterface
         vc.Chemical_ID,
         vc.PREFERRED_NAME,
         vc.cas_number,
-        vstc.environment_concentration,
-        vstc.environment_concentration_unit
+        vstc.environmental_concentration,
+        vstc.environmental_concentration_unit
       FROM view_samplesToChemicals vstc
         JOIN view_chemicals vc ON vc.Chemical_ID = vstc.Chemical_ID
         JOIN view_samples   vs ON vs.Sample_ID   = vstc.Sample_ID
       WHERE
         (vs.sample_matrix = 'PSD-Water' OR vs.sample_matrix = 'PSD-Air')
-        AND vstc.environment_concentration != 0
-        AND vstc.environment_concentration IS NOT NULL
+        AND vstc.environmental_concentration != 0
+        AND vstc.environmental_concentration IS NOT NULL
         AND vstc.Sample_ID = :sample_id
-      ORDER BY vstc.environment_concentration DESC";
+      ORDER BY vstc.environmental_concentration DESC";
 
     $rows = $this->database
       ->query($sql, [':sample_id' => $sanitized_id])
@@ -137,14 +137,14 @@ class EnvSampEnvConcChartBlock extends BlockBase implements BlockPluginInterface
       $chemical_ids[]   = $row->Chemical_ID;
       $chemical_names[] = $row->PREFERRED_NAME;
       $chemical_cas[]   = $row->cas_number ?? '';
-      $values[]         = (float) $row->environment_concentration;
-      $unit             = $row->environment_concentration_unit;
+      $values[]         = (float) $row->environmental_concentration;
+      $unit             = $row->environmental_concentration_unit;
       // Full row data for CSV download.
       $csv_rows[] = [
         'chemical_name' => $row->PREFERRED_NAME,
         'chemical_id'   => $row->Chemical_ID,
-        'concentration' => $row->environment_concentration,
-        'unit'          => $row->environment_concentration_unit,
+        'concentration' => $row->environmental_concentration,
+        'unit'          => $row->environmental_concentration_unit,
       ];
     }
 
