@@ -327,6 +327,7 @@ class EnvSampZfBmdRespChartBlock extends BlockBase implements BlockPluginInterfa
         'doseResponse' => $dose_response_by_endpoint[$endpoint_name] ?? [],
         'qcIconHtml'   => $qc_icon,
         'subtitleHtml' => $subtitle_html,
+        'modifier'     => $endpoint_modifiers[$endpoint_name] ?? 100,
       ];
 
       if ($default_endpoint_key === NULL || strtolower($endpoint_name) === 'any effect') {
@@ -422,25 +423,6 @@ class EnvSampZfBmdRespChartBlock extends BlockBase implements BlockPluginInterfa
     modeBarButtonsToRemove: ['pan2d', 'select2d', 'resetScale2d', 'lasso2d'/*, 'zoomOut2d'*/],
   };
 
-  var layout = {
-    yaxis: {
-      range: [0, 105],
-      tickvals: [0, 20, 40, 60, 80, 100],
-      title: { text: 'Percentage of Adverse Effects' },
-    },
-    xaxis: {
-      title: { text: 'Dilution' },
-    },
-    showlegend: true,
-    legend: {
-      orientation: 'h',
-      x: 0.5,
-      xanchor: 'center',
-      y: -0.2,
-    },
-    dragmode: 'zoom',
-  };
-
   // ---- Render a given endpoint's dataset -------------------------------------
   function renderEndpoint(key) {
     var dataset = datasets[key];
@@ -448,6 +430,35 @@ class EnvSampZfBmdRespChartBlock extends BlockBase implements BlockPluginInterfa
       return;
     }
     currentKey = key;
+
+    // Fixed 0-100 percentage ticks only apply when this endpoint's values
+    // were scaled by the *100 modifier — a modifier of 1 (continuous
+    // endpoints) is left on its native scale, so let Plotly auto-range it
+    // instead of forcing the percentage axis onto it.
+    var yaxis = dataset.modifier === 100
+      ? {
+          range: [0, 105],
+          tickvals: [0, 20, 40, 60, 80, 100],
+          title: { text: 'Percentage of Adverse Effects' },
+        }
+      : {
+          title: { text: 'Measured Response' },
+        };
+
+    var layout = {
+      yaxis: yaxis,
+      xaxis: {
+        title: { text: 'Dilution' },
+      },
+      showlegend: true,
+      legend: {
+        orientation: 'h',
+        x: 0.5,
+        xanchor: 'center',
+        y: -0.2,
+      },
+      dragmode: 'zoom',
+    };
 
     if (titleEl) {
       titleEl.innerHTML = 'Concentration Response Curve' + (dataset.qcIconHtml || '');
