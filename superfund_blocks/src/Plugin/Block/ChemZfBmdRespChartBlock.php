@@ -195,7 +195,7 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
           zcdr.End_Point_Name AS end_point_name,
           zcdr.End_Point_Type AS end_point_type,
           CASE
-            WHEN zcdr.End_Point_Type = 'continuous' THEN 1
+            WHEN zcdr.End_Point_Type = 'Cellular' THEN 1
             ELSE 100
             END as modifier
 

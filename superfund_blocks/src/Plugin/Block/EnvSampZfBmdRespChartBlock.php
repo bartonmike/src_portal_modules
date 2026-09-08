@@ -195,7 +195,7 @@ class EnvSampZfBmdRespChartBlock extends BlockBase implements BlockPluginInterfa
           zsdr.End_Point_Name AS end_point_name,
           zsdr.End_Point_Type AS end_point_type,
           CASE
-            WHEN zsdr.End_Point_Type = 'continuous' THEN 1
+            WHEN zsdr.End_Point_Type = 'Cellular' THEN 1
             ELSE 100
             END as modifier
 
