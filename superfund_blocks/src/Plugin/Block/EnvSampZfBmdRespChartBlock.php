@@ -194,7 +194,7 @@ class EnvSampZfBmdRespChartBlock extends BlockBase implements BlockPluginInterfa
         "SELECT DISTINCT zsdr.End_Point_Name AS end_point_name
          FROM view_zebrafishSampDoseResponse zsdr
          WHERE zsdr.End_Point_Name IS NOT NULL
-           AND zsdr.End_Point_Name IN (SELECT cen.End_Point_Name FROM view_chemical_endpoint_names cen)
+           AND zsdr.End_Point_Name IN (SELECT cen.End_Point_Name FROM view_chemical_endpoints cen)
            AND zsdr.Sample_ID = :sample_id",
         [':sample_id' => $sanitized_id]
       )

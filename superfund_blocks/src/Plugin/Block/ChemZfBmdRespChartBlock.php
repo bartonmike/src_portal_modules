@@ -194,7 +194,7 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
         "SELECT DISTINCT zcdr.End_Point_Name AS end_point_name
          FROM view_zebrafishChemDoseResponse zcdr
          WHERE zcdr.End_Point_Name IS NOT NULL
-           AND zcdr.End_Point_Name IN (SELECT cen.End_Point_Name FROM view_chemical_endpoint_names cen)
+           AND zcdr.End_Point_Name IN (SELECT cen.End_Point_Name FROM view_chemical_endpoints cen)
            AND zcdr.Chemical_ID = :chem_id",
         [':chem_id' => $sanitized_id]
       )
