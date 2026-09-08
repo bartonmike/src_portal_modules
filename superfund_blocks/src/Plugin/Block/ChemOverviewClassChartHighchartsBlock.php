@@ -159,8 +159,10 @@ class ChemOverviewClassChartHighchartsBlock extends BlockBase implements BlockPl
             // Clicking a slice filters the chemical overview table (a
             // separate block) by that class, if it's present on the page.
             click: function () {
-              if (window.superfundBlocks && window.superfundBlocks.filterChemicalsTableByClass) {
-                window.superfundBlocks.filterChemicalsTableByClass(this.name);
+              if (window.superfundBlocks) {
+                if (window.superfundBlocks.filterChemicalsTableByClass) {
+                  window.superfundBlocks.filterChemicalsTableByClass(this.name);
+                }
               }
             },
           },

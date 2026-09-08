@@ -189,8 +189,10 @@ class ChemOverviewClassChartBlock extends BlockBase implements BlockPluginInterf
     // Clicking a slice filters the chemical overview table (a separate
     // block) by that class, if it's present on the page.
     chartDiv.on('plotly_click', function (data) {
-      if (window.superfundBlocks && window.superfundBlocks.filterChemicalsTableByClass) {
-        window.superfundBlocks.filterChemicalsTableByClass(data.points[0].label);
+      if (window.superfundBlocks) {
+        if (window.superfundBlocks.filterChemicalsTableByClass) {
+          window.superfundBlocks.filterChemicalsTableByClass(data.points[0].label);
+        }
       }
     });
   }
