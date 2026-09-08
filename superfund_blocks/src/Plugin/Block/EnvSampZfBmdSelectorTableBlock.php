@@ -162,6 +162,7 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
         zed.endPointLink,
         CASE
           WHEN cen.End_Point_Name IN ('Behavior transition', '5 day total movement') THEN 4
+          When cen.End_Point_Name IN ('Comet Chip', 'Lactate Dehydrogenase', 'Mitochondrial Membrane Potential', 'Reactive Oxygen Species Detection') THEN 6
           ELSE 2
         END AS sort_order
       FROM view_chemical_endpoints cen
@@ -182,6 +183,10 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
 
       SELECT 'Behavioral Endpoints', '', NULL, NULL, NULL, NULL, '', NULL, NULL, 3
 
+      UNION
+
+      SELECT 'Cellular Endpoints (Human Cell Line)', '', NULL, NULL, NULL, NULL, '', NULL, NULL, 5
+
       ORDER BY sort_order, Endpoint";
 
     $rows = $this->database
@@ -199,7 +204,7 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
 
     $body_rows = [];
     foreach ($rows as $row) {
-      if (in_array($row->Endpoint, ['Morphological Endpoints', 'Behavioral Endpoints'], TRUE)) {
+      if (in_array($row->Endpoint, ['Morphological Endpoints (Zebrafish)', 'Behavioral Endpoints (Zebrafish)', 'Cellular Endpoints (Human Cell Line)'], TRUE)) {
         $body_rows[] = "<tr><td colspan='4'>" . htmlspecialchars($row->Endpoint, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</td></tr>';
         continue;
       }
