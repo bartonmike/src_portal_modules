@@ -163,6 +163,7 @@ class ChemZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInterf
         zed.endPointLink,
         CASE
           WHEN cen.End_Point_Name IN ('Behavior transition', '5 day total movement') THEN 4
+          When cen.End_Point_Name IN ('Comet Chip', 'Lactate Dehydrogenase', 'Mitochondrial Membrane Potential', 'Reactive Oxygen Species Detection') THEN 6
           ELSE 2
         END AS sort_order
       FROM view_chemical_endpoints cen
@@ -177,11 +178,15 @@ class ChemZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInterf
 
       UNION
 
-      SELECT 'Morphological Endpoints', '', NULL, NULL, NULL, NULL, '', NULL, NULL, 1
+      SELECT 'Morphological Endpoints (Zebrafish)', '', NULL, NULL, NULL, NULL, '', NULL, NULL, 1
 
       UNION
 
-      SELECT 'Behavioral Endpoints', '', NULL, NULL, NULL, NULL, '', NULL, NULL, 3
+      SELECT 'Behavioral Endpoints (Zebrafish)', '', NULL, NULL, NULL, NULL, '', NULL, NULL, 3
+
+      UNION
+
+      SELECT 'Cellular Endpoints (Human Cell Line)', '', NULL, NULL, NULL, NULL, '', NULL, NULL, 5
 
       ORDER BY sort_order, Endpoint";
 
