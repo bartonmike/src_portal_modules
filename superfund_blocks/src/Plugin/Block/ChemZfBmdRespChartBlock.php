@@ -191,7 +191,14 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
     // -------------------------------------------------------------------------
     $endpoint_rows = $this->database
       ->query(
-        "SELECT DISTINCT zcdr.End_Point_Name AS end_point_name
+        "SELECT DISTINCT
+          zcdr.End_Point_Name AS end_point_name,
+          zcdr.End_Point_Type AS end_point_type,
+          CASE
+            WHEN zcdr.End_Point_Type = 'continuous' THEN 1
+            ELSE 100
+            END as modifier
+
          FROM view_zebrafishChemDoseResponse zcdr
          WHERE zcdr.End_Point_Name IS NOT NULL
            AND zcdr.End_Point_Name IN (SELECT cen.End_Point_Name FROM view_chemical_endpoints cen)
@@ -205,6 +212,15 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
     }
 
     $endpoint_names = array_map(fn($row) => $row->end_point_name, $endpoint_rows);
+
+    // Continuous endpoints are already on a 0-1 scale that shouldn't be
+    // blown up into a percentage, so their modifier is 1; every other
+    // endpoint type keeps the existing *100 behavior. Looked up by name
+    // below in place of the old hardcoded *100.
+    $endpoint_modifiers = array_combine(
+      $endpoint_names,
+      array_map(fn($row) => (float) $row->modifier, $endpoint_rows)
+    );
 
     // -------------------------------------------------------------------------
     // 4. Fetch the fitted-curve line points for all endpoints.
@@ -221,9 +237,10 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
 
     $lines_by_endpoint = [];
     foreach ($line_rows as $row) {
+      $modifier = $endpoint_modifiers[$row->end_point_name] ?? 100;
       $lines_by_endpoint[$row->end_point_name][] = [
         'x' => (float) $row->x_val,
-        'y' => (float) $row->y_val * 100,
+        'y' => (float) $row->y_val * $modifier,
       ];
     }
 
@@ -243,11 +260,12 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
 
     $dose_response_by_endpoint = [];
     foreach ($dose_rows as $row) {
+      $modifier = $endpoint_modifiers[$row->end_point_name] ?? 100;
       $dose_response_by_endpoint[$row->end_point_name][] = [
         'dose'        => (float) $row->dose,
-        'response'    => (float) $row->response * 100,
-        'errorPlus'   => (float) $row->ci_hi * 100,
-        'errorMinus'  => (float) $row->ci_lo * 100,
+        'response'    => (float) $row->response * $modifier,
+        'errorPlus'   => (float) $row->ci_hi * $modifier,
+        'errorMinus'  => (float) $row->ci_lo * $modifier,
         'ciLo'        => (float) $row->ci_lo,
         'ciHi'        => (float) $row->ci_hi,
       ];
