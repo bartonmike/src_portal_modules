@@ -240,6 +240,12 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
         select.style.width = '100%';
         cell.appendChild(select);
 
+        // Stable id so other blocks on the page (e.g. the chemical class
+        // pie chart) can drive this filter from outside this script.
+        if (colIdx === 2) {
+          select.id = 'chemicals-table-class-filter';
+        }
+
         select.addEventListener('change', function () {
           column.search(this.value, { exact: true }).draw();
         });
@@ -255,6 +261,22 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
             select.add(new Option(text, text));
           });
       });
+
+      // Exposed so the chemical class pie chart (a separate block) can
+      // filter this table when a slice is clicked, without either block
+      // needing to know the other's internals beyond this one function.
+      window.superfundBlocks = window.superfundBlocks || {};
+      window.superfundBlocks.filterChemicalsTableByClass = function (className) {
+        var select = document.getElementById('chemicals-table-class-filter');
+        if (!select) {
+          return;
+        }
+        // The table leaves an unclassified chemical's class cell blank
+        // rather than labeling it, unlike the chart's "Unclassified" slice.
+        select.value = className === 'Unclassified' ? '' : className;
+        select.dispatchEvent(new Event('change'));
+        document.getElementById('chemicals_table').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
     },
   });
 })();

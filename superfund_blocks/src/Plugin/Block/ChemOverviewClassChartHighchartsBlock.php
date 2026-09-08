@@ -154,6 +154,17 @@ class ChemOverviewClassChartHighchartsBlock extends BlockBase implements BlockPl
         allowPointSelect: true,
         cursor: 'pointer',
         showInLegend: true,
+        point: {
+          events: {
+            // Clicking a slice filters the chemical overview table (a
+            // separate block) by that class, if it's present on the page.
+            click: function () {
+              if (window.superfundBlocks && window.superfundBlocks.filterChemicalsTableByClass) {
+                window.superfundBlocks.filterChemicalsTableByClass(this.name);
+              }
+            },
+          },
+        },
         dataLabels: [
           {
             enabled: true,
