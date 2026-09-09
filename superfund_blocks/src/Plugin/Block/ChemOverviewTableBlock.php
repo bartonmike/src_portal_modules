@@ -154,6 +154,16 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
     // -------------------------------------------------------------------------
     $js = <<<JS
 (function init() {
+  // Wait for the full document parse to finish, not just for the <table>
+  // tag to exist — getElementById can return the table while the browser
+  // is still mid-way through parsing/appending its ~1300 rows, and handing
+  // a partially-built tbody to DataTables is what was causing rows to look
+  // randomly truncated (fewer <td>s than expected) on some loads.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+    return;
+  }
+
   if (typeof DataTable === 'undefined' || !document.getElementById('chemicals_table')) {
     setTimeout(init, 50);
     return;
