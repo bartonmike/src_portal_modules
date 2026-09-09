@@ -334,6 +334,24 @@ class EnvSampOverviewTableBlock extends BlockBase implements BlockPluginInterfac
         });
       }
 
+      // DataTables rewrites every <thead> <th> into its own
+      // dt-column-header/dt-column-title structure during init, and strips
+      // interactive elements (like our <button>) out of that content in
+      // the process — only the icon survives. Rebuild a real button here,
+      // after DataTables has already finished mangling the header, so
+      // there's something for the click listener below to actually find.
+      var toggleTh = document.querySelector('#sample_locations thead tr.filters-toggle th');
+      if (toggleTh) {
+        var toggleTitle = toggleTh.querySelector('.dt-column-title');
+        if (toggleTitle) {
+          var toggleButton = document.createElement('button');
+          toggleButton.type = 'button';
+          toggleButton.className = 'filters-toggle-button';
+          toggleButton.innerHTML = toggleTitle.innerHTML;
+          toggleTitle.replaceWith(toggleButton);
+        }
+      }
+
       // Delegated on the table itself rather than a direct reference to the
       // button — DataTables can rebuild/rewrap header cells during init,
       // which would leave a directly-attached listener bound to a node
