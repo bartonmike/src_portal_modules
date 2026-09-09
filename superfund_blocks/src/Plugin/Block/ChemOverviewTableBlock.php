@@ -117,7 +117,7 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
       $chemical_name_esc  = htmlspecialchars($row->chemical_name ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       $cas_number_esc     = htmlspecialchars($row->cas_number ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       $chemical_class_esc = htmlspecialchars($row->chemical_class ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-      $sample_count_esc   = htmlspecialchars((string) $row->sample_count, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+      $sample_count_esc   = htmlspecialchars((string) ($row->sample_count ?? 0), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       $endpoints_esc      = htmlspecialchars($row->data_flags ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
       $body_rows[] = "<tr>"
