@@ -63,16 +63,23 @@ class EnvSampOverviewMapLeafletBlock extends BlockBase implements BlockPluginInt
     // 1. Fetch every sample location, across all samples.
     // -------------------------------------------------------------------------
     $sql = "SELECT DISTINCT
-        LocationName AS location,
+        vs.LocationName AS location,
         CASE
-          WHEN LocationAlternateDescription = 'NULL' THEN ''
-          WHEN LocationAlternateDescription = 'NA' THEN ''
-          ELSE LocationAlternateDescription
+          WHEN vs.LocationAlternateDescription = 'NULL' THEN ''
+          WHEN vs.LocationAlternateDescription = 'NA' THEN ''
+          ELSE vs.LocationAlternateDescription
         END AS description,
-        LocationLat AS lat,
-        LocationLon AS `long`
-      FROM view_samples
-      WHERE LocationLat IS NOT NULL";
+        vs.LocationLat AS lat,
+        vs.LocationLon AS `long`,
+        loc.sample_count AS sample_count
+      FROM view_samples vs
+      LEFT JOIN (
+        SELECT LocationName, COUNT(DISTINCT Sample_ID) AS sample_count
+        FROM view_samples
+        WHERE LocationLat IS NOT NULL
+        GROUP BY LocationName
+      ) loc ON loc.LocationName = vs.LocationName
+      WHERE vs.LocationLat IS NOT NULL";
 
     $rows = $this->database->query($sql)->fetchAll();
 
@@ -83,14 +90,24 @@ class EnvSampOverviewMapLeafletBlock extends BlockBase implements BlockPluginInt
     $locations = [];
 
     foreach ($rows as $row) {
-      $location    = htmlspecialchars($row->location ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-      $description = htmlspecialchars($row->description ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+      $location     = htmlspecialchars($row->location ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+      $description  = htmlspecialchars($row->description ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+      $sample_count = (int) ($row->sample_count ?? 0);
+
+      $lines = ["<strong>{$location}</strong>"];
+      if ($description !== '') {
+        $lines[] = $description;
+      }
+      $lines[] = $sample_count . ' sample' . ($sample_count === 1 ? '' : 's');
 
       $locations[] = [
         'lat'   => (float) $row->lat,
         'lon'   => (float) $row->long,
-        'popup' => $description !== '' ? "<strong>{$location}</strong><br>{$description}" : "<strong>{$location}</strong>",
+        'popup' => implode('<br>', $lines),
         'label' => $location,
+        // Raw (unescaped) name — used to drive the table filter by exact
+        // match, kept separate from the escaped $location used for display.
+        'name'  => $row->location ?? '',
       ];
     }
 
@@ -140,9 +157,21 @@ var Leaflet = L;
     });
 
     var markers = settings.locations.map(function (loc) {
-      return Leaflet.marker([loc.lat, loc.lon])
+      var marker = Leaflet.marker([loc.lat, loc.lon])
         .bindPopup(loc.popup)
         .bindTooltip(loc.label, { permanent: false });
+
+      // Clicking a marker filters the samples table (a separate block) by
+      // that location, if it's present on the page.
+      marker.on('click', function () {
+        if (window.superfundBlocks) {
+          if (window.superfundBlocks.filterSampleTableByLocation) {
+            window.superfundBlocks.filterSampleTableByLocation(loc.name);
+          }
+        }
+      });
+
+      return marker;
     });
 
     var samplingLocations = Leaflet.layerGroup(markers);

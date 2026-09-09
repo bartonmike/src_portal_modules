@@ -387,6 +387,12 @@ class EnvSampOverviewTableBlock extends BlockBase implements BlockPluginInterfac
         select.style.width = '100%';
         cell.appendChild(select);
 
+        // Stable id so other blocks on the page (e.g. the sample map) can
+        // drive this filter from outside this script.
+        if (colIdx === 3) {
+          select.id = 'sample-locations-table-location-filter';
+        }
+
         buildUniqueOptionsFromColumn(column).forEach(function (opt) {
           select.add(new Option(opt, opt));
         });
@@ -395,6 +401,25 @@ class EnvSampOverviewTableBlock extends BlockBase implements BlockPluginInterfac
           column.search(this.value, { exact: true }).draw();
         });
       });
+
+      // Exposed so the sample map (a separate block) can filter this table
+      // when a location marker is clicked, without either block needing to
+      // know the other's internals beyond this one function.
+      window.superfundBlocks = window.superfundBlocks || {};
+      window.superfundBlocks.filterSampleTableByLocation = function (location) {
+        var select = document.getElementById('sample-locations-table-location-filter');
+        if (!select) {
+          return;
+        }
+        select.value = location;
+        select.dispatchEvent(new Event('change'));
+
+        var filtersRowEl = document.querySelector('#sample_locations thead tr.filters');
+        if (filtersRowEl) {
+          filtersRowEl.style.display = '';
+        }
+        document.getElementById('sample_locations').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
 
       multiSelectCols.forEach(function (colIdx) {
         var column = api.column(colIdx);

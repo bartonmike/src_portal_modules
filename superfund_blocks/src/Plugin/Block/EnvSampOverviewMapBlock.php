@@ -62,12 +62,19 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
     // 1. Fetch every sample location, across all samples.
     // -------------------------------------------------------------------------
     $sql = "SELECT DISTINCT
-        LocationName AS location,
-        projectName  AS project_name,
-        LocationLat AS lat,
-        LocationLon AS `long`
-      FROM view_samples
-      WHERE LocationLat IS NOT NULL";
+        vs.LocationName AS location,
+        vs.projectName  AS project_name,
+        vs.LocationLat AS lat,
+        vs.LocationLon AS `long`,
+        loc.sample_count AS sample_count
+      FROM view_samples vs
+      LEFT JOIN (
+        SELECT LocationName, COUNT(DISTINCT Sample_ID) AS sample_count
+        FROM view_samples
+        WHERE LocationLat IS NOT NULL
+        GROUP BY LocationName
+      ) loc ON loc.LocationName = vs.LocationName
+      WHERE vs.LocationLat IS NOT NULL";
 
     $rows = $this->database->query($sql)->fetchAll();
 
@@ -75,17 +82,28 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
       return ['#markup' => ''];
     }
 
-    $lats  = [];
-    $lons  = [];
-    $texts = [];
+    $lats          = [];
+    $lons          = [];
+    $texts         = [];
+    $location_names = [];
 
     foreach ($rows as $row) {
       $location     = htmlspecialchars($row->location ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       $project_name = htmlspecialchars($row->project_name ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+      $sample_count = (int) ($row->sample_count ?? 0);
+
+      $lines = ["<b>{$location}</b>"];
+      if ($project_name !== '') {
+        $lines[] = $project_name;
+      }
+      $lines[] = $sample_count . ' sample' . ($sample_count === 1 ? '' : 's');
 
       $lats[]  = (float) $row->lat;
       $lons[]  = (float) $row->long;
-      $texts[] = $project_name !== '' ? "<b>{$location}</b><br>{$project_name}" : "<b>{$location}</b>";
+      $texts[] = implode('<br>', $lines);
+      // Raw (unescaped) name — used to drive the table filter by exact
+      // match, kept separate from the escaped copy used for display above.
+      $location_names[] = $row->location ?? '';
     }
 
     $chart_id = 'chart-env-samp-overview-map';
@@ -165,6 +183,17 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
 
   function renderMap() {
     Plotly.newPlot(chartDiv, [outerTrace, centerTrace], layout, config);
+
+    // Clicking a marker filters the samples table (a separate block) by
+    // that location, if it's present on the page.
+    chartDiv.on('plotly_click', function (data) {
+      if (window.superfundBlocks) {
+        if (window.superfundBlocks.filterSampleTableByLocation) {
+          var pointIndex = data.points[0].pointIndex;
+          window.superfundBlocks.filterSampleTableByLocation(settings.locationNames[pointIndex]);
+        }
+      }
+    });
   }
 
   if (chartDiv.offsetWidth !== 0) {
@@ -193,9 +222,10 @@ JS;
           'superfundBlocks' => [
             'envSampOverviewMap' => [
               $chart_id => [
-                'lats'  => $lats,
-                'lons'  => $lons,
-                'texts' => $texts,
+                'lats'          => $lats,
+                'lons'          => $lons,
+                'texts'         => $texts,
+                'locationNames' => $location_names,
               ],
             ],
           ],
