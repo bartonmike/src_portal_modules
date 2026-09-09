@@ -352,6 +352,14 @@ class EnvSampOverviewTableBlock extends BlockBase implements BlockPluginInterfac
         }
       }
 
+      // Same story as the button above — DataTables' header rebuild drops
+      // the filters row's inline display:none, so it shows by default
+      // unless we re-hide it here, after that rebuild has already happened.
+      var filtersRow = document.querySelector('#sample_locations thead tr.filters');
+      if (filtersRow) {
+        filtersRow.style.display = 'none';
+      }
+
       // Delegated on the table itself rather than a direct reference to the
       // button — DataTables can rebuild/rewrap header cells during init,
       // which would leave a directly-attached listener bound to a node

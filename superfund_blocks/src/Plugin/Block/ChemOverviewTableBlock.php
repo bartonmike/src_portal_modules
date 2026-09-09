@@ -173,11 +173,11 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
   // vs. the actual DOM row count at the moment DataTables is about to take
   // over — a mismatch here would point at caching/rendering between PHP
   // and the browser rather than the query itself.
-  console.log(
-    '[ChemOverviewTable] SQL rows:', {$rows_count},
-    'body_rows built:', {$body_rows_count},
-    'DOM tbody rows:', document.querySelectorAll('#chemicals_table tbody tr').length
-  );
+  // console.log(
+  //   '[ChemOverviewTable] SQL rows:', {$rows_count},
+  //   'body_rows built:', {$body_rows_count},
+  //   'DOM tbody rows:', document.querySelectorAll('#chemicals_table tbody tr').length
+  // );
 
   new DataTable('#chemicals_table', {
     pageLength: 20,
