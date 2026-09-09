@@ -129,7 +129,8 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
         . '</tr>';
     }
 
-    $html = "<table id='chemicals_table' class='display'>"
+    $html = "<!-- superfund_blocks: body_rows count = " . count($body_rows) . " -->"
+      . "<table id='chemicals_table' class='display'>"
       . '<thead>'
       . '<tr>'
       . '<th>Chemical Name</th>'
