@@ -129,8 +129,10 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
         . '</tr>';
     }
 
-    $html = "<!-- superfund_blocks: body_rows count = " . count($body_rows) . " -->"
-      . "<table id='chemicals_table' class='display'>"
+    $rows_count      = count($rows);
+    $body_rows_count = count($body_rows);
+
+    $html = "<table id='chemicals_table' class='display'>"
       . '<thead>'
       . '<tr>'
       . '<th>Chemical Name</th>'
@@ -156,6 +158,16 @@ class ChemOverviewTableBlock extends BlockBase implements BlockPluginInterface, 
     setTimeout(init, 50);
     return;
   }
+
+  // Debug aid: PHP-side counts (what this request's query/render produced)
+  // vs. the actual DOM row count at the moment DataTables is about to take
+  // over — a mismatch here would point at caching/rendering between PHP
+  // and the browser rather than the query itself.
+  console.log(
+    '[ChemOverviewTable] SQL rows:', {$rows_count},
+    'body_rows built:', {$body_rows_count},
+    'DOM tbody rows:', document.querySelectorAll('#chemicals_table tbody tr').length
+  );
 
   new DataTable('#chemicals_table', {
     pageLength: 20,
