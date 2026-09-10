@@ -98,14 +98,35 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
 
   /**
    * Builds a value-bar cell (AUC/BMD10/BMD50), or an "NA" cell.
+   *
+   * @param string|null $flag_label
+   *   Tooltip text for a failed-analysis indicator (e.g. "Failed BMD10
+   *   Analysis"), or NULL to show no indicator.
    */
-  protected function valueBarHtml($value, string $tooltip): string {
+  protected function valueBarHtml($value, string $tooltip, ?string $flag_label = NULL): string {
     if (is_null($value) || !is_numeric($value)) {
       return 'NA';
     }
     $safe_value   = htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $safe_tooltip = htmlspecialchars($tooltip, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    return "<div class='value-bar' data-value=\"{$safe_tooltip}\" style='--value: {$safe_value};'><div class='bar-fill'></div></div>";
+
+    $flag_html = '';
+    if ($flag_label !== NULL) {
+      $safe_flag_label = htmlspecialchars($flag_label, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+      $flag_html = "<span class='value-bar-flag' title=\"{$safe_flag_label}\"></span>";
+    }
+
+    return "<div class='value-bar' data-value=\"{$safe_tooltip}\" style='--value: {$safe_value};'><div class='bar-fill'></div>{$flag_html}</div>";
+  }
+
+  /**
+   * Builds the tooltip label for a failed BMD10/BMD50 analysis flag.
+   *
+   * @param string|null $flag
+   *   The raw BMD10_Flag/BMD50_Flag value ('pass', 'fail', or NULL).
+   */
+  protected function bmdFlagLabel(?string $flag, string $which): ?string {
+    return strtolower(trim((string) $flag)) === 'fail' ? "Failed {$which} Analysis" : NULL;
   }
 
   /**
@@ -155,7 +176,9 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
         LCASE(REPLACE(cen.End_Point_Name, ' ', '_')) AS end_point_name_cleaned,
         zsbmd.AUC_Norm AS AUC,
         zsbmd.BMD10,
+        zsbmd.BMD10_Flag,
         zsbmd.BMD50,
+        zsbmd.BMD50_Flag,
         zsbmd.Max_Dose AS Max_Dose,
         zsdr.End_Point_Name AS data_present,
         zed.description,
@@ -177,15 +200,15 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
 
       UNION
 
-      SELECT 'Morphological Endpoints', '', NULL, NULL, NULL, NULL, '', NULL, NULL, 1
+      SELECT 'Morphological Endpoints', '', NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, 1
 
       UNION
 
-      SELECT 'Behavioral Endpoints', '', NULL, NULL, NULL, NULL, '', NULL, NULL, 3
+      SELECT 'Behavioral Endpoints', '', NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, 3
 
       UNION
 
-      SELECT 'Cellular Endpoints (Human Cell Line)', '', NULL, NULL, NULL, NULL, '', NULL, NULL, 5
+      SELECT 'Cellular Endpoints (Human Cell Line)', '', NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, 5
 
       ORDER BY sort_order, Endpoint";
 
@@ -204,7 +227,7 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
 
     $body_rows = [];
     foreach ($rows as $row) {
-      if (in_array($row->Endpoint, ['Morphological Endpoints (Zebrafish)', 'Behavioral Endpoints (Zebrafish)', 'Cellular Endpoints (Human Cell Line)'], TRUE)) {
+      if (in_array($row->Endpoint, ['Morphological Endpoints', 'Behavioral Endpoints', 'Cellular Endpoints (Human Cell Line)'], TRUE)) {
         $body_rows[] = "<tr><td colspan='4'><b>" . htmlspecialchars($row->Endpoint, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</b></td></tr>';
         continue;
       }
@@ -226,11 +249,13 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
 
       $bmd10_tooltip = is_numeric($row->BMD10) ? round((float) $row->BMD10, 4) . '/' . ($max_dose ?? 'NA') : '';
       $bmd10_value = (is_numeric($row->BMD10) && $max_dose) ? min(1, (float) $row->BMD10 / $max_dose) : NULL;
-      $bmd10_html = is_null($bmd10_value) ? 'NA' : $this->valueBarHtml($bmd10_value, $bmd10_tooltip);
+      $bmd10_flag_label = $this->bmdFlagLabel($row->BMD10_Flag ?? NULL, 'BMD10');
+      $bmd10_html = is_null($bmd10_value) ? 'NA' : $this->valueBarHtml($bmd10_value, $bmd10_tooltip, $bmd10_flag_label);
 
       $bmd50_tooltip = is_numeric($row->BMD50) ? round((float) $row->BMD50, 4) . '/' . ($max_dose ?? 'NA') : '';
       $bmd50_value = (is_numeric($row->BMD50) && $max_dose) ? min(1, (float) $row->BMD50 / $max_dose) : NULL;
-      $bmd50_html = is_null($bmd50_value) ? 'NA' : $this->valueBarHtml($bmd50_value, $bmd50_tooltip);
+      $bmd50_flag_label = $this->bmdFlagLabel($row->BMD50_Flag ?? NULL, 'BMD50');
+      $bmd50_html = is_null($bmd50_value) ? 'NA' : $this->valueBarHtml($bmd50_value, $bmd50_tooltip, $bmd50_flag_label);
 
       $endpoint_html = $has_data ? '<u>' . $endpoint_name . '</u>' : $endpoint_name;
 
@@ -273,6 +298,22 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
       . '</table><br />'
       . $descriptor;
 
+    // Red dot in the top-right corner of a value-bar, shown when that
+    // endpoint's BMD10/BMD50 analysis is flagged as failed. Injected here
+    // (rather than relying on sitewide CSS) since .value-bar-flag doesn't
+    // exist outside this block.
+    $css = ".value-bar { position: relative; }"
+      . ".value-bar-flag {"
+      . 'position: absolute;'
+      . 'top: -4px;'
+      . 'right: -4px;'
+      . 'width: 8px;'
+      . 'height: 8px;'
+      . 'border-radius: 50%;'
+      . 'background: #d32f2f;'
+      . 'cursor: help;'
+      . '}';
+
     // -------------------------------------------------------------------------
     // 5. Inline script: delegate clicks on rows with a data-endpoint-key to
     //    the companion chart block's exposed render function.
@@ -310,6 +351,14 @@ JS;
       '#markup'   => $html,
       '#attached' => [
         'html_head' => [
+          [
+            [
+              '#type'  => 'html_tag',
+              '#tag'   => 'style',
+              '#value' => $css,
+            ],
+            'superfund_env_samp_zf_bmd_selector_style_' . $sanitized_id,
+          ],
           [
             [
               '#type'  => 'html_tag',
