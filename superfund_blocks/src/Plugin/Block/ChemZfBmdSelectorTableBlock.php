@@ -199,6 +199,7 @@ class ChemZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInterf
         ON zcdr.Chemical_ID = zcbmd.Chemical_ID AND zcdr.End_Point_Name = zcbmd.End_Point_Name
       LEFT JOIN superfund_zebrafish_endpoint_descriptions zed
         ON zed.End_Point_Name = cen.End_Point_Name
+      WHERE AUC_Norm IS NOT NULL
 
       UNION
 
