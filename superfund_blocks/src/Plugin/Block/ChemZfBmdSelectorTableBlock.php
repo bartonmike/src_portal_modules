@@ -107,7 +107,7 @@ class ChemZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInterf
    *   Tooltip text for a failed-analysis indicator (e.g. "Failed BMD10
    *   Analysis"), or NULL to show no indicator.
    */
-  protected function valueBarHtml($value, string $tooltip, ?string $flag_label = NULL): string {
+  protected function valueBarHtml2($value, string $tooltip, ?string $flag_label = NULL): string {
     if (is_null($value) || !is_numeric($value)) {
       return 'NA';
     }
