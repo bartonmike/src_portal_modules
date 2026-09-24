@@ -120,7 +120,7 @@ class ChemZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInterf
       $flag_html = "<span class='value-bar-flag' title=\"{$safe_flag_label}\"></span>";
     }
 
-    return "<div class='value-bar' data-value=\"{$safe_tooltip}\" style='--value: {$safe_value};'><div class='bar-fill'></div>{$flag_html}</div>";
+    return "<div class='value-bar' data-value=\"{$safe_tooltip}\" ><div class='bar-fill' style='--value: {$safe_value};'></div>{$flag_html}</div>";
   }
 
   /**
@@ -249,14 +249,14 @@ class ChemZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInterf
       $auc_html = $this->valueBarHtml($row->AUC, (string) $row->AUC);
 
       $bmd10_tooltip = is_numeric($row->BMD10) ? round((float) $row->BMD10, 4) . '/' . ($max_dose ?? 'NA') : '';
-      $bmd10_value = (is_numeric($row->BMD10) && $max_dose) ? min(1, (float) $row->BMD10 / $max_dose) : NULL;
+      $bmd10_value = (is_numeric($row->BMD10) && $max_dose) ? min(.00001, (float) $row->BMD10 / $max_dose) : NULL;
       $bmd10_flag_label = $this->bmdFlagLabel($row->BMD10_Flag ?? NULL, 'BMD10');
-      $bmd10_html = is_null($bmd10_value) ? 'NA' : $this->valueBarHtml($bmd10_value, $bmd10_tooltip, $bmd10_flag_label);
+      $bmd10_html = is_null($bmd10_value) ? 'No model found' : $this->valueBarHtml($bmd10_value, $bmd10_tooltip, $bmd10_flag_label);
 
       $bmd50_tooltip = is_numeric($row->BMD50) ? round((float) $row->BMD50, 4) . '/' . ($max_dose ?? 'NA') : '';
-      $bmd50_value = (is_numeric($row->BMD50) && $max_dose) ? min(1, (float) $row->BMD50 / $max_dose) : NULL;
+      $bmd50_value = (is_numeric($row->BMD50) && $max_dose) ? min(.00001, (float) $row->BMD50 / $max_dose) : NULL;
       $bmd50_flag_label = $this->bmdFlagLabel($row->BMD50_Flag ?? NULL, 'BMD50');
-      $bmd50_html = is_null($bmd50_value) ? 'NA' : $this->valueBarHtml($bmd50_value, $bmd50_tooltip, $bmd50_flag_label);
+      $bmd50_html = is_null($bmd50_value) ? 'No model found' : $this->valueBarHtml($bmd50_value, $bmd50_tooltip, $bmd50_flag_label);
 
       $endpoint_html = $has_data ? '<u>' . $endpoint_name . '</u>' : $endpoint_name;
 
