@@ -6,6 +6,7 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\superfund_blocks\ChemicalIdResolverTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -249,12 +250,12 @@ class ChemZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInterf
       $auc_html = $this->valueBarHtml($row->AUC, (string) $row->AUC);
 
       $bmd10_tooltip = is_numeric($row->BMD10) ? round((float) $row->BMD10, 4) . '/' . ($max_dose ?? 'NA') : '';
-      $bmd10_value = (is_numeric($row->BMD10) && $max_dose) ? min(.00001, (float) $row->BMD10 / $max_dose) : NULL;
+      $bmd10_value = (is_numeric($row->BMD10) && $max_dose) ? min(1, (float) $row->BMD10 / $max_dose) : NULL;
       $bmd10_flag_label = $this->bmdFlagLabel($row->BMD10_Flag ?? NULL, 'BMD10');
       $bmd10_html = is_null($bmd10_value) ? 'No model found' : $this->valueBarHtml($bmd10_value, $bmd10_tooltip, $bmd10_flag_label);
 
       $bmd50_tooltip = is_numeric($row->BMD50) ? round((float) $row->BMD50, 4) . '/' . ($max_dose ?? 'NA') : '';
-      $bmd50_value = (is_numeric($row->BMD50) && $max_dose) ? min(.00001, (float) $row->BMD50 / $max_dose) : NULL;
+      $bmd50_value = (is_numeric($row->BMD50) && $max_dose) ? min(1, (float) $row->BMD50 / $max_dose) : NULL;
       $bmd50_flag_label = $this->bmdFlagLabel($row->BMD50_Flag ?? NULL, 'BMD50');
       $bmd50_html = is_null($bmd50_value) ? 'No model found' : $this->valueBarHtml($bmd50_value, $bmd50_tooltip, $bmd50_flag_label);
 
@@ -349,7 +350,12 @@ JS;
 
     return [
       '#type'     => 'markup',
-      '#markup'   => $html,
+      // Markup::create() marks $html as already-safe so Drupal skips its
+      // Xss::filterAdmin() pass, which strips every inline style="..."
+      // attribute — including the --value one the bars are sized by. Every
+      // dynamic value in $html is escaped above, so nothing unescaped goes
+      // through.
+      '#markup'   => Markup::create($html),
       '#attached' => [
         'html_head' => [
           [

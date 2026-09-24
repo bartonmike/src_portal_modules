@@ -6,6 +6,7 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\Markup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -116,7 +117,7 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
       $flag_html = "<span class='value-bar-flag' title=\"{$safe_flag_label}\"></span>";
     }
 
-    return "<div class='value-bar' data-value=\"{$safe_tooltip}\" style='--value: {$safe_value};'><div class='bar-fill'></div>{$flag_html}</div>";
+    return "<div class='value-bar' data-value=\"{$safe_tooltip}\"><div class='bar-fill' style='--value: {$safe_value};'></div>{$flag_html}</div>";
   }
 
   /**
@@ -348,7 +349,12 @@ JS;
 
     return [
       '#type'     => 'markup',
-      '#markup'   => $html,
+      // Markup::create() marks $html as already-safe so Drupal skips its
+      // Xss::filterAdmin() pass, which strips every inline style="..."
+      // attribute — including the --value one the bars are sized by. Every
+      // dynamic value in $html is escaped above, so nothing unescaped goes
+      // through.
+      '#markup'   => Markup::create($html),
       '#attached' => [
         'html_head' => [
           [
