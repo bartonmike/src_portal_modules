@@ -106,7 +106,7 @@ class ChemOverviewClassChartHighchartsBlock extends BlockBase implements BlockPl
       . "PCB = polychlorinated biphenyls, a group of synthetic and toxic chlorinated hydrocarbon chemicals."
       . "</div>";
 
-    $html = "<h2>Chemicals Measured</h2>"
+    $html = "<h2>Chemicals Studied</h2>"
       . "<div id='{$chart_id}' class='highcharts-light' style='width:100%;height:400px;'></div>"
       . $descriptor;
 

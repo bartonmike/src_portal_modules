@@ -37,6 +37,17 @@ class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginIn
   protected const UNGROUPED_LABEL = 'Other';
 
   /**
+   * Display label per End_Point_Type (lowercase key), in the order the groups
+   * should appear. Any type not listed here follows these, alphabetically,
+   * under its own name.
+   */
+  protected const GROUP_LABELS = [
+    'morphological' => 'Zebrafish: Morphological',
+    'behavioral'    => 'Zebrafish: Behavioral',
+    'cellular'      => 'Lung: Cellular',
+  ];
+
+  /**
    * The database connection.
    *
    * @var \Drupal\Core\Database\Connection
@@ -91,9 +102,10 @@ class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginIn
       return ['#markup' => ''];
     }
 
-    // Bucket endpoints by End_Point_Type, then order groups alphabetically
-    // and endpoints alphabetically within each group (matching the order the
-    // chemical page's endpoint table uses).
+    // Bucket endpoints by End_Point_Type, order the groups per GROUP_LABELS
+    // (unlisted types after, alphabetically), and order endpoints
+    // alphabetically within each group (matching the order the chemical
+    // page's endpoint table uses).
     $grouped = [];
     foreach ($rows as $row) {
       $group = trim((string) ($row->category_group ?? ''));
@@ -105,7 +117,12 @@ class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginIn
         'count'    => (int) $row->value,
       ];
     }
-    ksort($grouped, SORT_NATURAL | SORT_FLAG_CASE);
+    $group_rank = array_flip(array_keys(self::GROUP_LABELS));
+    uksort($grouped, function ($a, $b) use ($group_rank) {
+      $rank_a = $group_rank[strtolower((string) $a)] ?? count($group_rank);
+      $rank_b = $group_rank[strtolower((string) $b)] ?? count($group_rank);
+      return ($rank_a <=> $rank_b) ?: strcasecmp((string) $a, (string) $b);
+    });
 
     $categories = [];
     $groups     = [];
@@ -115,6 +132,8 @@ class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginIn
     foreach ($grouped as $group_name => $items) {
       usort($items, fn($a, $b) => strcasecmp($a['endpoint'], $b['endpoint']));
 
+      $group_label = self::GROUP_LABELS[strtolower((string) $group_name)] ?? (string) $group_name;
+
       $group_categories = [];
       $group_values     = [];
       foreach ($items as $item) {
@@ -123,13 +142,13 @@ class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginIn
         $group_values[]     = $item['count'];
         $csv_rows[] = [
           'endpoint' => $item['endpoint'],
-          'group'    => $group_name,
+          'group'    => $group_label,
           'count'    => $item['count'],
         ];
       }
 
       $groups[] = [
-        'name'       => (string) $group_name,
+        'name'       => $group_label,
         'color'      => self::GROUP_COLORS[$color_idx % count(self::GROUP_COLORS)],
         'categories' => $group_categories,
         'values'     => $group_values,
@@ -146,9 +165,9 @@ class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginIn
     //    - Chart init JS lives in an inline script that waits for
     //      DOMContentLoaded.
     // -------------------------------------------------------------------------
-    $descriptor = "<div class='chem-overview-endpoints-plot element-descriptor'>"
+    $descriptor = "<div class='chem-overview-endpoints-highcharts element-descriptor'>"
       . "<strong>Endpoints:</strong> Counts of the total number of measurements "
-      . "captured from assays of zebrafish exposure to chemicals. To look at a specific "
+      . "captured from assays of model exposure to chemicals. To look at a specific "
       . "chemical, search and select using the table below. Click the underlined chemical "
       . "name in the first column to open a chemical page."
       . "</div>";
