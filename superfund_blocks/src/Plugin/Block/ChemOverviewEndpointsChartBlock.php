@@ -24,13 +24,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
 
   /**
-   * Bar color palette, cycled through per category.
+   * Bar color per endpoint group (End_Point_Type), cycled if there are more
+   * groups than colors.
    */
-  protected const PALETTE = [
-    '#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A1FF33',
-    '#33A1FF', '#FF8C33', '#8C33FF', '#33FF8C', '#FF33FF',
-    '#FFD733', '#33FFD7', '#D733FF', '#33FF33', '#FF3333',
+  protected const GROUP_COLORS = [
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b',
   ];
+
+  /**
+   * Group label for endpoints with no End_Point_Type.
+   */
+  protected const UNGROUPED_LABEL = 'Other';
 
   /**
    * The database connection.
@@ -74,6 +78,7 @@ class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginIn
     // -------------------------------------------------------------------------
     $sql = "SELECT DISTINCT
         c.End_Point_Name AS category,
+        c.End_Point_Type as category_group,
         (SELECT COUNT(c2.Chemical_ID)
          FROM view_zebrafishChemXYCoords c2
          WHERE c2.End_Point_Name = c.End_Point_Name) AS value
@@ -86,17 +91,50 @@ class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginIn
       return ['#markup' => ''];
     }
 
-    $categories = [];
-    $values     = [];
-    $csv_rows   = [];
-
+    // Bucket endpoints by End_Point_Type, then order groups alphabetically
+    // and endpoints alphabetically within each group (matching the order the
+    // chemical page's endpoint table uses).
+    $grouped = [];
     foreach ($rows as $row) {
-      $categories[] = $row->category;
-      $values[]     = (int) $row->value;
-      $csv_rows[] = [
-        'endpoint' => $row->category,
+      $group = trim((string) ($row->category_group ?? ''));
+      if ($group === '') {
+        $group = self::UNGROUPED_LABEL;
+      }
+      $grouped[$group][] = [
+        'endpoint' => (string) $row->category,
         'count'    => (int) $row->value,
       ];
+    }
+    ksort($grouped, SORT_NATURAL | SORT_FLAG_CASE);
+
+    $categories = [];
+    $groups     = [];
+    $csv_rows   = [];
+    $color_idx  = 0;
+
+    foreach ($grouped as $group_name => $items) {
+      usort($items, fn($a, $b) => strcasecmp($a['endpoint'], $b['endpoint']));
+
+      $group_categories = [];
+      $group_values     = [];
+      foreach ($items as $item) {
+        $categories[]       = $item['endpoint'];
+        $group_categories[] = $item['endpoint'];
+        $group_values[]     = $item['count'];
+        $csv_rows[] = [
+          'endpoint' => $item['endpoint'],
+          'group'    => $group_name,
+          'count'    => $item['count'],
+        ];
+      }
+
+      $groups[] = [
+        'name'       => (string) $group_name,
+        'color'      => self::GROUP_COLORS[$color_idx % count(self::GROUP_COLORS)],
+        'categories' => $group_categories,
+        'values'     => $group_values,
+      ];
+      $color_idx++;
     }
 
     $chart_id = 'chart-chem-overview-endpoints';
@@ -109,7 +147,7 @@ class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginIn
     //      DOMContentLoaded.
     // -------------------------------------------------------------------------
     $descriptor = "<div class='chem-overview-endpoints-plot element-descriptor'>"
-      . "<strong>Zebrafish Endpoints:</strong> Counts of the total number of measurements "
+      . "<strong>Endpoints:</strong> Counts of the total number of measurements "
       . "captured from assays of zebrafish exposure to chemicals. To look at a specific "
       . "chemical, search and select using the table below. Click the underlined chemical "
       . "name in the first column to open a chemical page."
@@ -131,17 +169,17 @@ class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginIn
   var chartDiv    = document.getElementById('{$chart_id}');
   var settings    = drupalSettings.superfundBlocks.chemOverviewEndpoints['{$chart_id}'];
   var categories  = settings.categories;
-  var values      = settings.values;
-  var palette     = settings.palette;
+  var groups      = settings.groups;
   var csvRows     = settings.csvRows;
 
   // ---- CSV download -----------------------------------------------------
   function downloadCsv() {
-    var headers = ['Endpoint', 'Count'];
+    var headers = ['Endpoint', 'Group', 'Count'];
     var lines   = [headers.join(',')];
     csvRows.forEach(function (row) {
       lines.push([
         '"' + String(row.endpoint).replace(/"/g, '""') + '"',
+        '"' + String(row.group).replace(/"/g, '""') + '"',
         row.count,
       ].join(','));
     });
@@ -176,20 +214,25 @@ class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginIn
     modeBarButtonsToRemove: ['pan2d', 'select2d', 'resetScale2d', 'lasso2d', 'zoomOut2d'],
   };
 
-  var barColors = categories.map(function (name, i) {
-    return palette[i % palette.length];
+  // One trace per endpoint group, so each group gets its own color and its
+  // own legend entry (click a legend item to hide/show that group).
+  var traces = groups.map(function (g) {
+    return {
+      type: 'bar',
+      orientation: 'h',
+      name: g.name,
+      y: g.categories,
+      x: g.values,
+      marker: { color: g.color },
+    };
   });
 
-  var trace = {
-    type: 'bar',
-    orientation: 'h',
-    y: categories,
-    x: values,
-    marker: { color: barColors },
-  };
-
   var layout = {
-    showlegend: false,
+    showlegend: true,
+    legend: { title: { text: 'Endpoint Type' } },
+    // Each endpoint only appears in one trace, so overlay keeps the bars
+    // full-width instead of splitting each row into one slot per group.
+    barmode: 'overlay',
     xaxis: {
       title: { text: 'Count' },
       rangemode: 'tozero',
@@ -197,12 +240,16 @@ class ChemOverviewEndpointsChartBlock extends BlockBase implements BlockPluginIn
     yaxis: {
       type: 'category',
       automargin: true,
+      // Keep endpoints clustered by group, first group at the top.
+      categoryorder: 'array',
+      categoryarray: categories,
+      autorange: 'reversed',
     },
     margin: { l: 200 },
   };
 
   function renderChart() {
-    Plotly.newPlot(chartDiv, [trace], layout, config);
+    Plotly.newPlot(chartDiv, traces, layout, config);
   }
 
   if (chartDiv.offsetWidth !== 0) {
@@ -232,8 +279,7 @@ JS;
             'chemOverviewEndpoints' => [
               $chart_id => [
                 'categories' => $categories,
-                'values'     => $values,
-                'palette'    => self::PALETTE,
+                'groups'     => $groups,
                 'csvRows'    => $csv_rows,
               ],
             ],
