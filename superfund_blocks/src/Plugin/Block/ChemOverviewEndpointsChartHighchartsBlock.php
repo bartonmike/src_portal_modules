@@ -25,13 +25,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ChemOverviewEndpointsChartHighchartsBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
 
   /**
-   * Bar color palette, cycled through per category.
+   * Bar color per endpoint group (End_Point_Type), cycled if there are more
+   * groups than colors.
    */
-  protected const PALETTE = [
-    '#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A1FF33',
-    '#33A1FF', '#FF8C33', '#8C33FF', '#33FF8C', '#FF33FF',
-    '#FFD733', '#33FFD7', '#D733FF', '#33FF33', '#FF3333',
+  protected const GROUP_COLORS = [
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b',
   ];
+
+  /**
+   * Group label for endpoints with no End_Point_Type.
+   */
+  protected const UNGROUPED_LABEL = 'Other';
 
   /**
    * The database connection.
@@ -75,6 +79,7 @@ class ChemOverviewEndpointsChartHighchartsBlock extends BlockBase implements Blo
     // -------------------------------------------------------------------------
     $sql = "SELECT DISTINCT
         c.End_Point_Name AS category,
+        c.End_Point_Type AS category_group,
         (SELECT COUNT(c2.Chemical_ID)
          FROM view_zebrafishChemXYCoords c2
          WHERE c2.End_Point_Name = c.End_Point_Name) AS value
@@ -87,17 +92,50 @@ class ChemOverviewEndpointsChartHighchartsBlock extends BlockBase implements Blo
       return ['#markup' => ''];
     }
 
-    $categories = [];
-    $values     = [];
-    $csv_rows   = [];
-
+    // Bucket endpoints by End_Point_Type, then order groups alphabetically
+    // and endpoints alphabetically within each group (matching the order the
+    // chemical page's endpoint table uses).
+    $grouped = [];
     foreach ($rows as $row) {
-      $categories[] = $row->category;
-      $values[]     = (int) $row->value;
-      $csv_rows[] = [
-        'endpoint' => $row->category,
+      $group = trim((string) ($row->category_group ?? ''));
+      if ($group === '') {
+        $group = self::UNGROUPED_LABEL;
+      }
+      $grouped[$group][] = [
+        'endpoint' => (string) $row->category,
         'count'    => (int) $row->value,
       ];
+    }
+    ksort($grouped, SORT_NATURAL | SORT_FLAG_CASE);
+
+    $categories = [];
+    $groups     = [];
+    $csv_rows   = [];
+    $color_idx  = 0;
+
+    foreach ($grouped as $group_name => $items) {
+      usort($items, fn($a, $b) => strcasecmp($a['endpoint'], $b['endpoint']));
+
+      $group_categories = [];
+      $group_values     = [];
+      foreach ($items as $item) {
+        $categories[]       = $item['endpoint'];
+        $group_categories[] = $item['endpoint'];
+        $group_values[]     = $item['count'];
+        $csv_rows[] = [
+          'endpoint' => $item['endpoint'],
+          'group'    => $group_name,
+          'count'    => $item['count'],
+        ];
+      }
+
+      $groups[] = [
+        'name'       => (string) $group_name,
+        'color'      => self::GROUP_COLORS[$color_idx % count(self::GROUP_COLORS)],
+        'categories' => $group_categories,
+        'values'     => $group_values,
+      ];
+      $color_idx++;
     }
 
     $chart_id = 'chart-chem-overview-endpoints-highcharts';
@@ -131,6 +169,20 @@ class ChemOverviewEndpointsChartHighchartsBlock extends BlockBase implements Blo
   var chartDiv = document.getElementById('{$chart_id}');
   var settings = drupalSettings.superfundBlocks.chemOverviewEndpointsHighcharts['{$chart_id}'];
 
+  // One series per endpoint group, each aligned to the full category list
+  // (null where a category belongs to a different group), so every group
+  // gets its own color and legend entry.
+  var series = settings.groups.map(function (g) {
+    return {
+      name: g.name,
+      color: g.color,
+      data: settings.categories.map(function (cat) {
+        var idx = g.categories.indexOf(cat);
+        return idx === -1 ? null : g.values[idx];
+      }),
+    };
+  });
+
   var chartOptions = {
     chart: {
       type: 'bar',
@@ -149,28 +201,28 @@ class ChemOverviewEndpointsChartHighchartsBlock extends BlockBase implements Blo
       pointFormat: '<b>{point.y}</b>',
     },
     legend: {
-      enabled: false,
+      enabled: true,
+      title: { text: 'Endpoint Type' },
     },
-    colors: settings.palette,
     exporting: {
       filename: 'chem-overview-endpoints',
       csv: {
         columnHeaderFormatter: function (item, key) {
-          return key === 'y' ? 'Count' : 'Endpoint';
+          if (item.isXAxis) {
+            return 'Endpoint';
+          }
+          return item.name;
         },
       },
     },
     plotOptions: {
+      // Each category only has a value in one series, so stacking keeps the
+      // bars full-width instead of reserving a thin slot per group.
       bar: {
-        colorByPoint: true,
+        stacking: 'normal',
       },
     },
-    series: [
-      {
-        name: 'Chemicals',
-        data: settings.values,
-      },
-    ],
+    series: series,
   };
 
   function renderChart() {
@@ -204,8 +256,7 @@ JS;
             'chemOverviewEndpointsHighcharts' => [
               $chart_id => [
                 'categories' => $categories,
-                'values'     => $values,
-                'palette'    => self::PALETTE,
+                'groups'     => $groups,
                 'csvRows'    => $csv_rows,
               ],
             ],
