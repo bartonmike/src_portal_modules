@@ -104,7 +104,7 @@ class EnvSampOverviewChemOccurrenceChartHighchartsBlock extends BlockBase implem
     //$html = "<div id='{$chart_id}' class='highcharts-light' style='width:100%;height:400px;'></div>";
     
 
-    $html = "<h2>Chemicals Measured Per Class</h2>"
+    $html = "<h2>Chemical Measurements Per Class</h2>"
       . "<div id='{$chart_id}' class='highcharts-light' style='width:100%;height:400px;'></div>"
       . $descriptor;
 
