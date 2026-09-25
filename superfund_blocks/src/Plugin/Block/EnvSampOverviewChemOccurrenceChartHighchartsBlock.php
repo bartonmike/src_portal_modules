@@ -101,7 +101,12 @@ class EnvSampOverviewChemOccurrenceChartHighchartsBlock extends BlockBase implem
     //    - Chart data passed through drupalSettings (the Drupal-safe way).
     //    - Chart init JS lives in an inline script that polls for readiness.
     // -------------------------------------------------------------------------
-    $html = "<div id='{$chart_id}' class='highcharts-light' style='width:100%;height:400px;'></div>";
+    //$html = "<div id='{$chart_id}' class='highcharts-light' style='width:100%;height:400px;'></div>";
+    
+
+    $html = "<h2>Chemicals Measured Per Class</h2>"
+      . "<div id='{$chart_id}' class='highcharts-light' style='width:100%;height:400px;'></div>"
+      . $descriptor;
 
     // Inline init script — no defer, polls until Highcharts, drupalSettings,
     // and the chart container are all ready.
@@ -119,7 +124,7 @@ class EnvSampOverviewChemOccurrenceChartHighchartsBlock extends BlockBase implem
     chart: {
       type: 'pie',
     },
-    title: { text: '' },
+    //title: { text: '' },
     subtitle: { text: '' },
     accessibility: {
       point: { valueSuffix: '%' },
