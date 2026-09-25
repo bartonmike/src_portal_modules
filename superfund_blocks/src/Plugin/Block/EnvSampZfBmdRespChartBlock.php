@@ -187,9 +187,9 @@ class EnvSampZfBmdRespChartBlock extends BlockBase implements BlockPluginInterfa
       ->query(
         "SELECT COUNT(zsbmd.AUC_Norm) AS count
          FROM view_zebrafishSampBMDs zsbmd
-         INNER JOIN view_zebrafishSampDoseResponse zsdr
+         OUTER JOIN view_zebrafishSampDoseResponse zsdr
            ON (zsbmd.Sample_ID = zsdr.Sample_ID AND zsbmd.End_Point_Name = zsdr.End_Point_Name)
-         INNER view_zebrafishSampXYCoords zsxy
+         OUTER JOIN view_zebrafishSampXYCoords zsxy
            ON (zsxy.Sample_ID = zsbmd.Sample_ID AND zsxy.End_Point_Name = zsbmd.End_Point_Name)
          WHERE zsbmd.BMD10 IS NOT NULL
            AND zsbmd.Sample_ID = :sample_id",
