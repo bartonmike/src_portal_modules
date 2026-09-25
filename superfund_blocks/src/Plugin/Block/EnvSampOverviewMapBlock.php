@@ -146,6 +146,10 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
     type: 'scattermap',
     lat: settings.lats,
     lon: settings.lons,
+    // Explicit empty name: with no name Plotly labels the hover's side box
+    // "trace 0", and it doesn't rely on the <extra></extra> tag below
+    // surviving this site's script-content encoding.
+    name: '',
     text: settings.texts,
     hovertemplate: '%{text}<extra></extra>',
     mode: 'markers',
@@ -156,6 +160,7 @@ class EnvSampOverviewMapBlock extends BlockBase implements BlockPluginInterface,
     type: 'scattermap',
     lat: settings.lats,
     lon: settings.lons,
+    name: '',
     mode: 'markers',
     hoverinfo: 'skip',
     marker: { size: 6, color: '#ffffff' },
