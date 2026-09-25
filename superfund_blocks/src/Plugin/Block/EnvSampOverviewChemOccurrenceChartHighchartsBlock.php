@@ -103,8 +103,11 @@ class EnvSampOverviewChemOccurrenceChartHighchartsBlock extends BlockBase implem
     // -------------------------------------------------------------------------
     //$html = "<div id='{$chart_id}' class='highcharts-light' style='width:100%;height:400px;'></div>";
     
+    $descriptor = "<div class='env-samp-overview-chem-occurence-element-descriptor'>"
+      . "<strong>Total Observations:</strong> The number of times a chemical category was observed across all samples."
+      . "</div>";
 
-    $html = "<h2>Chemical Measurements Per Class</h2>"
+    $html = "<h2>Chemical Measurements Per Category</h2>"
       . "<div id='{$chart_id}' class='highcharts-light' style='width:100%;height:400px;'></div>"
       . $descriptor;
 
