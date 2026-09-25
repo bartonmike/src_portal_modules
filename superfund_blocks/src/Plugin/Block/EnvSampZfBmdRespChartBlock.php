@@ -167,7 +167,7 @@ class EnvSampZfBmdRespChartBlock extends BlockBase implements BlockPluginInterfa
     // -------------------------------------------------------------------------
     // 2. Confirm the sample has a complete BMD analysis for "any effect".
     // -------------------------------------------------------------------------
-    $count = (int) $this->database
+    /*$count = (int) $this->database
       ->query(
         "SELECT COUNT(zsxy.X_vals) AS count
          FROM view_zebrafishSampXYCoords zsxy
@@ -178,6 +178,21 @@ class EnvSampZfBmdRespChartBlock extends BlockBase implements BlockPluginInterfa
          WHERE zsbmd.BMD10 IS NOT NULL
            AND zsxy.Sample_ID = :sample_id
            AND zsxy.End_Point_Name = 'any effect'",
+        [':sample_id' => $sanitized_id]
+      )
+      ->fetchField();*/
+
+
+       $count = (int) $this->database
+      ->query(
+        "SELECT COUNT(zsbmd.AUC_Norm) AS count
+         FROM view_zebrafishSampBMDs zsbmd
+         INNER JOIN view_zebrafishSampDoseResponse zsdr
+           ON (zsbmd.Sample_ID = zsdr.Sample_ID AND zsbmd.End_Point_Name = zsdr.End_Point_Name)
+         INNER view_zebrafishSampXYCoords zsxy
+           ON (zsxy.Sample_ID = zsbmd.Sample_ID AND zsxy.End_Point_Name = zsbmd.End_Point_Name)
+         WHERE zsbmd.BMD10 IS NOT NULL
+           AND zsbmd.Sample_ID = :sample_id",
         [':sample_id' => $sanitized_id]
       )
       ->fetchField();
