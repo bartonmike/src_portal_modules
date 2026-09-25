@@ -135,7 +135,7 @@ class EnvSampOverviewEndpointsChartHighchartsBlock extends BlockBase implements 
     chart: {
       type: 'bar',
     },
-    //title: { text: 'Endpoints Measured' },
+    title: { text: '' },
     subtitle: { text: '' },
     xAxis: {
       categories: settings.categories,

@@ -124,7 +124,7 @@ class EnvSampOverviewChemOccurrenceChartHighchartsBlock extends BlockBase implem
     chart: {
       type: 'pie',
     },
-    //title: { text: '' },
+    title: { text: '' },
     subtitle: { text: '' },
     accessibility: {
       point: { valueSuffix: '%' },
