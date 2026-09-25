@@ -1,0 +1,1022 @@
+<div class="glossary-layout">
+<aside class="sidebar">
+  <nav>
+
+    <a href="#home" class="current">How to Use this Website</a>
+
+    <details class="nav-group">
+      <summary><i>bmdrc</i> Calculations</summary>
+      <a href="#bmdrc-understanding" class="sub">Understanding <i>bmdrc</i></a>
+        <a href="#bmdrc-models" class="subsub">Models</a>
+        <a href="#bmdrc-model-selection-workflow" class="subsub">Model Selection Workflow</a>
+        <a href="#bmdrc-pipeline-summary" class="subsub">Pipeline Summary</a>
+      <a href="#bmdrc-methods-and-plots-reported-measurements" class="subsub">Reported Measurements</a>
+        <a href="#bmdrc-morphology-endpoints" class="subsub">Morphology Endpoints</a>
+        <a href="#bmdrc-behavioral-endpoints" class="subsub">Behavioral Endpoints</a>
+    </details>
+
+    <details class="nav-group">
+      <summary>Chemicals</summary>
+      <a href="#chemicals-description" class="sub">Chemicals Description</a>
+      <a href="#chemicals-cell-measurement-endpoints" class="sub">Cell Measurement Endpoints</a>
+    </details>
+
+    <details class="nav-group">
+      <summary>Data Types</summary>
+      <a href="#data-types-zebrafish" class="subsub">Zebrafish</a>
+      <a href="#data-types-endpoints" class="sub">Endpoints</a>
+          <a href="#data-types-zebrafish-endpoints" class="subsub">Zebrafish Endpoints</a>
+          <a href="#data-types-cell-measurement-endpoints" class="subsub">Cell Measurement Endpoints</a>
+      <a href="#data-types-environmental-samplers" class="sub">Environmental Samplers</a>
+          <a href="#data-types-passive-sampling-devices" class="subsub">Passive Sampling Devices</a>
+          <a href="#data-types-note-on-passive-sample-data" class="subsub">A Note on Passive Sample Data</a>
+    </details>
+
+
+    <details class="nav-group">
+      <summary>Human Exposome</summary>
+      <a href="#human-exposome" class="sub">Overview</a>
+      <a href="#human-exposome-how-it-works" class="sub">How it Works</a>
+    </details>
+
+    <details class="nav-group">
+      <summary>Methods and Plots</summary>
+      <a href="#methods-and-plots" class="sub">Plot Interpretation</a>
+          <a href="#methods-and-plots-zebrafish-morphological-measurements-table" class="subsub">Zebrafish Morphological Measurements Table</a>
+          <a href="#methods-and-plots-zebrafish-morphological-measurements-plot" class="subsub">Zebrafish Morphological Measurements Plot</a>
+            <a href="#methods-and-plots-zebrafish-morphological-measurements-plot-curveshape" class="subsub">How to Interpret the Curve Shape</a>
+          <a href="#methods-and-plots-navigation" class="sub">Navigation</a>
+    </details>
+
+    <details class="nav-group">
+      <summary>Transcriptome</summary>
+      <a href="#transcriptome-comingsoon" class="sub">Coming Soon</a>
+    </details>
+
+
+    <details class="nav-group">
+      <summary>Glossary</summary>
+      <a href="#glossary-website-chart-terms" class="sub">Website and Chart Terms</a>
+      <a href="#glossary-environmental-exposure-sampling" class="sub">Environmental Exposure and Sampling</a>
+      <a href="#glossary-zebrafish-biological-endpoints" class="sub">Zebrafish and Biological Endpoints</a>
+      <a href="#glossary-dose-response-model-terms" class="sub">Dose–Response and Model Terms</a>
+      <a href="#glossary-units-measurements" class="sub">Units and Measurements</a>
+    </details>
+
+  </nav>
+</aside>
+
+<main class="content">
+
+  <!-- ============ HOME: how to use ============ -->
+  <section id="home">
+    <h2>Project Overview</h2>
+    <p>The Oregon State University - Pacific Northwest National Laboratory (OSU-PNNL) Superfund Center focuses on polycyclic aromatic hydrocarbons (PAHs).
+      &nbsp; <a href="https://www.epa.gov/superfund">The Superfund Research Program</a> (SRP), part of the
+      &nbsp; <a href="https://www.niehs.nih.gov/">National Institute of Environmental Health Sciences</a> (NIEHS), supports university-based research
+      centers that investigate the environmental and health effects of hazardous substances. PAHs are a group of hundreds of different chemicals formed by burning organic material. </p>
+    <p>PAHs are a health concern because people can be exposed to them through contaminated air, water, soil, and tobacco smoke. Some PAHs are known or suspected carcinogens,
+      while others are associated with adverse health effects such as respiratory disease, impaired immune function, reproductive, and developmental outcomes. </p>
+    <p>This website brings together data and visualizations from the OSU-PNNL research program. Passive samplers provide information about environmental and personal exposure profiles.
+    Zebrafish assays quantify developmental and behavioral changes following controlled chemical exposures to detect biological anomalies, measurements of the expression in genes in response to chemicals. </p>
+    <p><a href="https://superfund.oregonstate.edu/">Learn more about the OSU-PNNL Superfund Research Center </a></p>
+
+    <h3>How to Use This Website</h3>
+    <p>Use the sidebar menu to explore bmdrc calculations, chemical measurements, data types, transcriptomic, human exposome data, and more. Use the top navigation menu to move between the main sections of the website.
+      Each section contains information, visualizations, or interactive charts related to the project data. </p>
+    <h3>How to Use the Charts</h3>
+    <p>The charts are interactive. Use the tools shown below to explore, adjust, and download chart results.</p>
+  <div>
+
+  <figure class="middle-center-image" style="width: 2500px;">
+    <img
+      src="https://raw.githubusercontent.com/abigailga0012/gifs_glossary/refs/heads/main/plot_example.gif"
+      alt="Animation demonstrating chart tools, including hovering, zooming, resetting, and downloading a chart."
+      style="width: 1000px; max-width: 100%;">
+    <figcaption>
+      Chart tools are located in the upper-right corner of the chart.
+    </figcaption>
+    </figure>
+    <h3>Chart Tools</h3>
+    <ol>
+      <li><strong>View values:</strong> Hover over a bar, point, or line to view its label and exact value.</li>
+      <li><strong>Zoom:</strong> Click and drag across part of the chart to zoom in on a specific area.</li>
+      <li><strong>Pan:</strong> Use the pan tool to move across the chart after zooming.</li>
+      <li><strong>Reset view:</strong> Select the home or reset-axes icon to return to the original chart view.</li>
+      <li><strong>Download:</strong> Select the camera icon to download the current chart view as a PNG image.</li>
+    </ol>
+  </div>
+
+  </section>
+
+  <!-- ============ Placeholder sections ============ -->
+  <section id="bmdrc">
+    <h2><i>bmdrc</i></h2>
+    <h3 id="bmdrc-calculations">Benchmark Dose Calculations</h3>
+    <figure class="side-figure" style ="width: 300px;" >
+      <img src="https://raw.githubusercontent.com/PNNL-CompBio/bmdrc/main/bmdrc_logo_new.png"
+        alt="bmdrc Python Package Logo">
+    </figure>
+    <p>
+    The Python package <a href="https://github.com/PNNL-CompBio/bmdrc/"><i>bmdrc</i></a> was used to calculate the curves for each endpoint.
+    </p>
+
+    <h3 id="bmdrc-understanding">Understanding <i>bmdrc</i></h3>
+    <h4 id="bmdrc-models">Models</h4>
+    <p>
+      Dose–response models are fitted to describe the relationship between
+      chemical concentration and the observed response in zebrafish. The
+      available models depend on whether the endpoint is measured as a
+      proportional response or as a continuous response.
+    </p>
+
+    <table width="1000">
+    <tr>
+    <td>
+      <h4>Proportional-Response Models</h4>
+      <p>
+        Used when the response is measured as a proportion or percentage,
+        such as the percentage of zebrafish affected at each concentration.
+      </p>
+      <ul>
+        <li>Logistic</li>
+        <li>Gamma</li>
+        <li>Weibull</li>
+        <li>Log-Logistic</li>
+        <li>Probit</li>
+        <li>Log-Probit</li>
+        <li>Multistage</li>
+        <li>Quantal Linear</li>
+      </ul>
+    </td>
+
+    <td>
+      <h4>Continuous-Response Models</h4>
+      <p>
+        Used when the response is measured on a continuous scale, such as
+        movement, length, weight, or another numerical measurement.
+      </p>
+      <ul>
+        <li>Asymptotic Regression</li>
+        <li>Exponential</li>
+        <li>Gompertz</li>
+        <li>Hill</li>
+        <li>Michaelis-Menten</li>
+        <li>Power</li>
+        <li>Weibull</li>
+      </ul>
+    </td>
+    </tr>
+    </table>
+
+    <strong>Note:</strong> See the glossary for definitions and additional details about each dose–response model.
+
+    <h4 id="bmdrc-model-selection-workflow">Model Selection Workflow</h4>
+    <p>Each endpoint is evaluated using an automated process to identify the best-fitting dose–response model.</p>
+    <table width="900">
+    <tbody>
+    <tr>
+    <td width="100" style="vertical-align: top;">
+    <p><strong>Process</strong></p>
+    </td>
+    <td width="600" style="vertical-align: top;">
+    <p><strong>Description</strong></p>
+    </td>
+    </tr>
+    <tr>
+    <td style="vertical-align: top;">
+    <p>Fit Models</p>
+    </td>
+    <td style="vertical-align: top;">
+    <p>Candidate models are fit to proportional or continuous-response data. The available models depend on the endpoint type.</p>
+    </td>
+    </tr>
+    <tr>
+    <td style="vertical-align: top;">
+    <p>Check Fit</p>
+    </td>
+    <td style="vertical-align: top;">
+    <p>Models with a goodness-of-fit p-value below 0.1 are removed from consideration.</p>
+    </td>
+    </tr>
+    <tr>
+    <td style="vertical-align: top;">
+    <p>Compare AIC</p>
+    </td>
+    <td style="vertical-align: top;">
+    <p>Models within 2 AIC units of the lowest AIC value are retained. Lower AIC values indicate a better balance between model fit and complexity.</p>
+    </td>
+    </tr>
+    <tr>
+    <td style="vertical-align: top;">
+    <p>Select Model</p>
+    </td>
+    <td style="vertical-align: top;">
+    <p>The retained model with the lowest BMDL is selected, consistent with EPA guidance.</p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
+
+    <h4 id="bmdrc-pipeline-summary">Pipeline Summary</h4>
+    <p>
+      [INSERT TEXT]
+    </p>
+
+    <h4 id="bmdrc-methods-and-plots-reported-measurements"> Reported Measurements</h4>
+    <p>The selected model may report:</p>
+    <ul>
+    <li><strong>BMD10:</strong> Estimated concentration associated with a 10% response.</li>
+    <li><strong>BMDL:</strong> Lower confidence limit of the estimated benchmark dose.</li>
+    <li><strong>BMD50:</strong> Estimated concentration associated with a 50% response.</li></ul>
+
+
+    <h4 id="bmdrc-morphology-endpoints">Morphology Endpoints</h4>
+    <p>
+      Morphological endpoints capture physical abnormalities in developing
+      zebrafish. Each phenotype is scored as absent or present and may be modeled
+      as the proportion of affected fish within a treatment group.
+    </p>
+    <p>During processing, individual phenotypes may be combined into aggregate endpoints. Examples include:</p>
+    <ul>
+    <li><strong>Cranium:</strong> An aggregate endpoint that includes abnormalities of the eye, snout, and jaw.</li>
+    <li><strong>Total Mortality (24 hours):</strong> Mortality recorded 24 hours after exposure.</li>
+    <li><strong>Total Mortality (5 days):</strong> Mortality recorded 5 days after exposure.</li>
+    </ul>
+
+    <p>See the <a href="#data-types-zebrafish-endpoints">Zebrafish Endpoints table</a> for descriptions of all morphological endpoints.</p>
+
+    <h4 id="bmdrc-behavioral-endpoints">Behavioral Endpoints (LPR)</h4>
+
+    <p>
+      Larval photomotor response (LPR) measures zebrafish movement during
+      alternating light and dark cycles. These measurements are treated as
+      continuous-response data.
+    </p>
+
+    <p>
+      To process LPR data, the light/dark exposure-cycle length, time between
+      cycles, and whether the light or dark cycle occurs first are specified.
+      These settings are used to derive behavioral endpoints.
+    </p>
+
+    <table width="900">
+    <tbody>
+    <tr>
+    <td width="60" style="vertical-align: top;">
+    <p><strong>Endpoint</strong></p>
+    </td>
+    <td width="700" style="vertical-align: top;">
+    <p><strong>Description</strong></p>
+    </td>
+    </tr>
+
+    <tr>
+    <td width="60" style="vertical-align: top;">
+    <p>AUC</p>
+    </td>
+    <td width="700" style="vertical-align: top;">
+    <p>5 days total movement. This endpoint summarizes the total amount of movement measured during the behavioral assay.</p>
+    </td>
+    </tr>
+
+    <tr>
+    <td width="60" style="vertical-align: top;">
+    <p>MOV</p>
+    </td>
+    <td width="700" style="vertical-align: top;">
+    <p>Behavioral transition. This endpoint describes the change in movement between light and dark cycles.</p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
+
+    <p>
+    LPR input data is stored in long format and include the chemical
+    identifier, concentration, plate identifier, well, measured movement, and
+    measurement time.
+    </p>
+  </section>
+
+  <section id="chemicals">
+  <h2>Chemicals</h2>
+  <h3 id="chemicals-description">Chemical Description</h3>
+  <p> [To Do]</p>
+  <h3 id="chemicals-cell-measurement-endpoints">Cell Measurement Endpoints</h3>
+  <p> [To Do]</p>
+  </section>
+
+  <section id="data-types">
+    <h2>Data Types</h2>
+
+    <h3 id="data-types-zebrafish">Zebrafish</h3>
+
+    <figure class="side-figure" style ="width: 170px;" >
+      <img src="https://yale-threesixty.files.svdcdn.com/production/features/Tank-of-zebrafish-YaleE360_225.jpg"
+        alt="Zebrafish housed in laboratory tanks">
+      <figcaption>Zebrafish housed in laboratory tanks at Oregon State University. Dr. Tanguay</figcaption>
+    </figure>
+    <p>
+    Zebrafish are small tropical freshwater vertebrates widely used as a research model because they share many conserved genes, organs, and developmental pathways
+    with humans. Their rapid, transparent early development and high rates of reproduction enable <em>in vivo</em> studies of chemical and mixture toxicity across developmental,
+    behavioral, and molecular endpoints.
+    </p>
+
+    <figure class="middle-center-image">
+      <p class="video-title">Watch: High-Throughput Zebrafish Model for Predictive Toxicology (Tanguay Lab) </p>
+      <div class="video-frame">
+        <iframe width="760" height="415" src="https://www.youtube.com/embed/KHlsb8Bg1y4" frameborder="0" allow="accelerometer; autoplay;encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+      </div>
+    </figure>
+
+    <h3 id="data-types-endpoints">Endpoints</h3>
+    <p>
+      An “endpoint” is a measurement of a phenotype in response to increasing concentrations of a chemical.
+      Examples of endpoints include physiological changes in zebrafish anatomy such as malformations of the cranium,
+      behavioral changes in zebrafish, such as fry failing to respond to light stimulus,
+      and responses in cellular studies (such as mitochondrial membrane potential). This website includes the following endpoints:
+    </p>
+
+
+
+    <h3 id="data-types-zebrafish-endpoints">Zebrafish Endpoints</h3>
+    <table width="900">
+    <tbody>
+    <tr>
+    <td width="150">
+    <p><strong>Endpoint</strong></p>
+    </td>
+    <td width="550">
+    <p><strong>Description</strong></p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>5 days old<sup>[<a href="http://purl.obolibrary.org/obo/ZP_0012599">1</a>]</sup></p>
+    </td>
+    <td width="550">
+    <p>Total movement in the dark minus total movement in the light.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Any effect</p>
+    </td>
+    <td width="550">
+    <p>Any abnormality or death within 5 days. This endpoint combines all measurements collected at 24 hours and 5 days.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Any effect except mortality</p>
+    </td>
+    <td width="550">
+    <p>Any morphological abnormality, excluding mortality.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Any effect in 24 hours</p>
+    </td>
+    <td width="550">
+    <p>Any abnormality or death at 24 hours.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Axis<sup>[<a href="http://purl.obolibrary.org/obo/ZP_0005012">2</a>]</sup></p>
+    </td>
+    <td width="550">
+    <p>The body axis is visibly curved, either concave or convex at 5 days.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Behavioral transition<sup>[<a href="http://purl.obolibrary.org/obo/ZP_0137685">3</a>]</sup></p>
+    </td>
+    <td width="550">
+    <p>A change in movement in response to the presence or absence of light, measured at 5 days.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Brain<sup>[<a href="http://purl.obolibrary.org/obo/ZP_0001601">4</a>,</sup><a href="http://purl.obolibrary.org/obo/ZP_0000100"><sup>5</sup></a><sup>,</sup><a href="http://purl.obolibrary.org/obo/ZP_0008625"><sup>6</sup></a><sup>]</sup></p>
+    </td>
+    <td width="550">
+    <p>An abnormal brain region identified by its appearance, color, or size at 5 days.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Craniofacial<sup>[<a href="http://purl.obolibrary.org/obo/ZP_0000943">7</a>,</sup><a href="http://purl.obolibrary.org/obo/ZP_0014550"><sup>8</sup></a><sup>,</sup><a href="http://purl.obolibrary.org/obo/ZP_0007203"><sup>9</sup></a><sup>]</sup></p>
+    </td>
+    <td width="550">
+    <p>Periocular edema, abnormally small or missing eye(s), misshapen snout and protruding jaw form a highly correlated suite of malformations. All simplified to craniofacial defects at 5 days.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Edema<sup>[<a href="http://purl.obolibrary.org/obo/ZP_0002060">10</a>]</sup></p>
+    </td>
+    <td width="550">
+    <p>Distended clear region around the heart and/or yolk sac or top of the head with a lumpy appearance of swollen tissue at 5 days</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Lower Trunk<sup>[<a href="http://purl.obolibrary.org/obo/ZP_0003437">11</a>,</sup><a href="http://purl.obolibrary.org/obo/ZP_0010405"><sup>12</sup></a><sup>]</sup></p>
+    </td>
+    <td width="550">
+    <p>Shorter than normal body from the posterior of the yolk sac to the caudal fin. Abnormal caudal fin at 5 days.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Mortality at 24 hours<sup>[<a href="http://purl.obolibrary.org/obo/UBERON_0000071">13</a>]</sup></p>
+    </td>
+    <td width="550">
+    <p>Death occurred from shortly after chemical dosing to 24 hours post-fertilization.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Total mortality<sup>[</sup><a href="http://purl.obolibrary.org/obo/UBERON_0000071"><sup>14</sup></a><sup>]</sup></p>
+    </td>
+    <td width="550">
+    <p>Death occurred within 5 days post fertilization.</p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
+
+    <h3 id="data-types-cell-measurement-endpoints">Cell Measurement Endpoints</h3>
+<table>
+  <tbody>
+    <tr>
+      <td width="162">
+        <p><strong>Term</strong></p>
+      </td>
+      <td width="800">
+        <p><strong>Description</strong></p>
+      </td>
+    </tr>
+
+    <tr>
+      <td width="162">
+        <p>Comet Chip</p>
+      </td>
+      <td width="500">
+        <p>
+        An indicator of the amount of DNA damage in response to a chemical.
+        </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td width="162">
+        <p>Lactate Dehydrogenase</p>
+      </td>
+      <td width="500">
+        <p>
+        Ruptured cells release lactate dehydrogenase.
+        </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td width="162">
+        <p>Mitochondrial Membrane Potential</p>
+      </td>
+      <td width="500">
+        <p>
+          Measures the effect of chemical concentration on mitochondria performance.
+        </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td width="162">
+        <p>Reactive Oxygen Species Detection</p>
+      </td>
+      <td width="500">
+        <p>
+        Measured by the degradation of one compound (DCFh3 to DCF). Accumulation may have a negative impact on cellular metabolism.
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+    <h3 id="data-types-environmental-samplers">Environmental Samplers</h3>
+    <p>
+    Passive sampling devices (PSDs) absorb organic contaminants from the environment during their deployment. Because these devices collect chemicals continuously,
+    they can provide a measurement that reflects the average contaminant level during a specific period. PSDs are placed in
+    air, water, and sediment near Superfund sites to measure environmental chemical exposure.
+    </p>
+
+
+    <figure class="middle-center-image" style ="width: 750px;" >
+      <img src="https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41597-023-02021-5/MediaObjects/41597_2023_2021_Fig2_HTML.png?as=webp"
+        alt="Silicone Wristbands from the Superfund Research Center at Oregon State University">
+    </figure>
+
+    <h3 id="data-types-passive-sampling-devices">Passive Sampling Devices</h3>
+
+    <div class="item-list">
+      <div class="item">
+        <img src="https://superfund.oregonstate.edu/sites/superfund.oregonstate.edu/files/media/image/passive-sampling-devices-2.jpg" alt="Passive air sampler">
+        <div>
+          <h4>Air sampler</h4>
+          <p>Sampling material is housed inside a protective device that allows air and airborne chemicals to flow through and contact the sampler.</p>
+        </div>
+      </div>
+
+      <div class="item">
+        <img src="https://superfund.oregonstate.edu/sites/superfund.oregonstate.edu/files/media/image/passive-sampling-devices-3.jpg" alt="Water sampler">
+        <div>
+          <h4>Water Sampler</h4>
+          <p>Sampling material is arranged on metal disks inside a perforated cylinder, allowing water and dissolved chemicals to flow through and contact the sampler.</p>
+        </div>
+      </div>
+
+      <div class="item">
+        <img src="https://superfund.oregonstate.edu/sites/superfund.oregonstate.edu/files/media/image/passive-sampling-devices-4.jpg" alt="Sediment sampler">
+        <div>
+          <h4>Sediment Sampler</h4>
+          <p>The sampler is buried in the sediment so water can flow through the holes in the metal frame and carry dissolved chemicals into the sampling material.</p>
+        </div>
+      </div>
+
+      <div class="item">
+        <img src="https://superfund.oregonstate.edu/sites/superfund.oregonstate.edu/files/media/image/passive-sampling-devices-8.jpg" alt="Wristband sampler">
+        <div>
+          <h4>Wristbands</h4>
+          <p>Made of silicone, this sampler is worn like a bracelet and detects chemicals to which the wearer is exposed.</p>
+        </div>
+      </div>
+    </div>
+
+
+    <h4 id="data-types-note-on-passive-sample-data">A Note on Passive Sample Data</h4>
+    <p>
+    Samples from Superfund sites have also been administered to zebrafish, and the results can be found on the &nbsp; <a href="https://src.oregonstate.edu/environmental-samples">"Environmental Samples"</a>
+    pages with zebrafish data.
+    </p>
+  </section>
+
+  <section id="human-exposome">
+    <h2>Human Exposome</h2>
+    <h3>Overview</h3>
+    <div class="clear"></div>
+    <figure class="middle-center-image" style ="width: 600px;" >
+      <img src="https://superfund.oregonstate.edu/sites/superfund.oregonstate.edu/files/styles/fluid_webp/public/2025-07/wristband.jpg.webp?itok=gqRnUKQO"
+        alt="Silicone Wristbands from the Superfund Research Center at Oregon State University">
+      <figcaption>Silicone Wristbands from the Superfund Research Center at Oregon State University</figcaption>
+    </figure>
+    <div class="clear"></div>
+    <p>
+    Wristbands measure personal exposure to chemicals continuously throughout their deployment, helping to characterize exposure profiles rather than
+    exposure to single compounds. These measurements support research on the potential health impacts of those exposures. Because wristbands are lightweight, easy to transport, and require minimal
+    maintenance, they offer a unique opportunity to assess chemical exposure in communities that may be difficult to reach with traditional assessment methods, including remote populations and vulnerable
+    groups during disruptive situations such as disasters or pandemics. Wristbands can also simultaneously capture many chemicals, enabling mixture focused analyses and prioritization of chemical combinations for future studies.
+    The results should be interpreted as external exposures as opposed to internal doses such as chemicals in the bloodstream.
+    </p>
+
+    <h3 id="human-exposome-how-it-works">How It Works</h3>
+
+    <figure class="side-figure" style ="width: 500px;" >
+      <img src="https://superfund.oregonstate.edu/sites/superfund.oregonstate.edu/files/media/image/passive-wristband-sampler_thumbnail.png"
+        alt="Passive wristband sampler">
+    </figure>
+    <ul>
+      <li><strong>Wear:</strong> Participants wear a silicone wristband during daily life.</li>
+      <li><strong>Passive uptake:</strong> Chemicals move from the surrounding environment into the silicone over time.</li>
+      <li><strong>Return and laboratory analysis:</strong> Wristbands are easy to wear, generally require minimal training and can be returned to the laboratory by mail at ambient temperature for extraction and chemical analysis.</li>
+    </ul>
+  </section>
+  <div class="clear"></div>
+
+  <section id="methods-and-plots">
+  <h2>Methods and Plots</h2>
+  <h4 id="methods-and-plots-zebrafish-morphological-measurements-table">Understanding the Zebrafish Morphological Measurements Table</h4>
+  <p>
+  See the linked example:&nbsp; <a href="https://src.oregonstate.edu/chemicals/view?id=163">the Chemicals View Page: 1,2,3-Benzotriazole </a>
+  </p>
+  <p>
+  This table summarizes dose–response modeling results for zebrafish morphological and behavioral endpoints. Each row represents a measured biological endpoint,
+  such as <i>Any Effect, Craniofacial, or Brain</i>.
+  Select an endpoint name to view its corresponding <strong><a href="#methods-and-plots-zebrafish-morphological-measurements-plot">concentration–response curve</a>.</strong>
+  </p>
+  <p>
+  The remaining columns provide a summary of the fitted dose–response measurements. Descriptions of each column are provided below.
+  </p>
+    <table width="1000" style="vertical-align: top;" >
+    <tbody>
+    <tr>
+    <td width="150" style="vertical-align: top;">
+    <p><strong>Columns</strong></p>
+    </td>
+    <td width="550" style="vertical-align: top;">
+    <p><strong>Description</strong></p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150" style="vertical-align: top;">
+    <p>Endpoint</p>
+    </td>
+    <td width="550" style="vertical-align: top;">
+    <p>Morphological and behavioral endpoints. Select an underlined endpoint (e.g., <u>Any effect</u>) name to display the corresponding concentration–response curve plot</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150" style="vertical-align: top;">
+    <p>AUC (Area Under the Curve)</p>
+    </td>
+    <td width="550" style="vertical-align: top;">
+    <p style="margin: 0;">A unitless summary, ranging from 0 to 1, of the overall response magnitude across the tested concentration range.</p>
+    <p style="margin: 0;">0 indicates a flat line at 0% response, meaning no response was observed at any concentration.</p>
+    <p style="margin: 0;">1 indicates a flat line at 100% response, meaning the maximum response was observed at all concentrations.</p>
+    <p style="margin: 0;">**Higher AUC values indicate a stronger or broader response for that endpoint**</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150" style="vertical-align: top;">
+    <p>BMD10 (Benchmark Dose, 10%)</p>
+    </td>
+    <td width="550" style="vertical-align: top;">
+    <p style="margin: 0;">The estimated concentration at which 10% of zebrafish are affected. Often used to identify an earlier or lower-level effect.</p>
+    <p style="margin: 0;">A lower BMD10 value indicates that an effect occurs at lower concentrations.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150" style="vertical-align: top;">
+    <p>BMD50 (Benchmark Dose, 50%)</p>
+    </td>
+    <td width="550" style="vertical-align: top;">
+    <p style="margin: 0;">The estimated concentration at which 50% of zebrafish are affected. Represents a larger, more common effect in the tested population. </p>
+    <p style="margin: 0;">A lower BMD50 means half of the zebrafish are affected at a lower concentration.</p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
+
+  <h4 id="methods-and-plots-zebrafish-morphological-measurements-plot" style="margin-top: 1.5rem;">Zebrafish Morphological Measurements Plot</h4>
+  <p>
+    Selecting an underlined endpoint name from the <strong><a href="#methods-and-plots-zebrafish-morphological-measurements-table"> Zebrafish Morphological Measurements Table</a></strong>
+    displays its concentration–response plot. The plot shows how the measured response changes across the tested chemical concentrations.
+  </p>
+
+    <table width="1000" style="vertical-align: top;">
+    <tbody>
+    <tr>
+    <td width="150">
+    <p><strong>Feature</strong></p>
+    </td>
+    <td width="550">
+    <p><strong>Description</strong></p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>X-axis</p>
+    </td>
+    <td width="550">
+    <p>The tested chemical concentration or dilution level. Values increase from left to right.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Y-axis</p>
+    </td>
+    <td width="550"  style="vertical-align: top;">
+    <p style="margin: 0;">The measured response for the selected endpoint.</p>
+    <p style="margin: 0;">For morphological endpoints, the y-axis generally represents the percentage of zebrafish affected, from 0% to 100%.</p>
+    <p style="margin: 0;">For behavioral or continuous-response endpoints, the y-axis may represent an average measurement, such as movement, rather than the
+      percentage of zebrafish affected.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Observed Data Points</p>
+    </td>
+    <td width="550" style="vertical-align: top;">
+    <p style="margin: 0;">The plotted points represent the observed response at each tested concentration.</p>
+    <p style="margin: 0;">Vertical lines, when shown, represent variation or uncertainty among replicate measurements.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Fitted Curve</p>
+    </td>
+    <td width="550" style="vertical-align: top;">
+    <p style="margin: 0;">The fitted curve is a mathematical model that describes the relationship between chemical concentration and the measured response.</p>
+    <p style="margin: 0;">The curve is used to calculate summary measurements such as AUC, BMD10, and BMD50.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Model</p>
+    </td>
+    <td width="550" style="vertical-align: top;">
+    <p> The model name identifies the dose–response model selected as the best fit for the observed data. Models may include logistic,
+      log-logistic, Hill, exponential, polynomial, or other model types.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Header Information</p>
+    </td>
+    <td width="550">
+    <p>The plot header identifies the selected endpoint, the fitted model, and applicable model summary measurements, including AUC, BMD10, and BMD50.</p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
+
+
+  <h4 id="methods-and-plots-zebrafish-morphological-measurements-plot-curveshape">How to Interpret the Curve Shape</h4>
+
+    <table width="1000" style="vertical-align: top;">
+    <tbody>
+    <tr>
+    <td width="150">
+    <p><strong>Curve Shape</strong></p>
+    </td>
+    <td width="550">
+    <p><strong>Interpretation</strong></p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Steep Rise</p>
+    </td>
+    <td width="550">
+    <p>The response changes rapidly over a narrow range of concentrations.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Gradual Rise</p>
+    </td>
+    <td width="550">
+    <p>The response increases more slowly across the tested concentration range.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Flat Near 0%</p>
+    </td>
+    <td width="550">
+    <p>Little or no response was observed across the tested concentrations.</p>
+    </td>
+    </tr>
+    <tr>
+    <td width="150">
+    <p>Plateau Near 100%</p>
+    </td>
+    <td width="550">
+    <p>The maximum proportional response has been reached. Increasing the concentration further may not substantially increase the percentage
+      of zebrafish affected.</p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
+
+
+  <h3 id="methods-and-plots-navigation">Navigation</h3>
+  <div>
+    <figure class="middle-center-image" style ="width: 850px;" >
+    <img
+      src="https://raw.githubusercontent.com/abigailga0012/gifs_glossary/refs/heads/main/zebrafish_measurement_table_plot.gif"
+      alt="Zebrafish measurement table plot"
+      style="width: 800px; max-width: 100%;">
+    <figcaption> The measurements table and concentration–response plot are linked.</figcaption>
+    </figure>
+    <p> Select an underlined endpoint name in the table to view its corresponding concentration–response curve.
+      The plot on the right updates to display the observed data points, fitted curve, and model summary values for the selected endpoint, including AUC, BMD10, and BMD50 when available.</p>
+  </div>
+
+  </section>
+
+  <section id="transcriptome">
+  <h2>Transcriptome</h2>
+  <h3 id="transcriptome-comingsoon">Coming Soon</h3>
+  <p>[To Do]</p>
+  </section>
+
+
+  <section id="glossary">
+  <h2>Glossary</h2>
+  <p>This glossary defines terms used throughout the website, including interactive charts, environmental exposure, zebrafish endpoints, and dose–response modeling.</p>
+  <h3 id="glossary-website-chart-terms">Website and Chart Terms</h3>
+  <ul>
+
+  <li>
+    <strong>Observed Data Points:</strong>
+    Measurements collected experimentally at each tested chemical
+    concentration. These measurements are displayed as points on a chart.
+  </li>
+
+  <li>
+    <strong>Fitted Curve:</strong>
+    A mathematical curve fitted to the observed data. It describes the
+    estimated relationship between chemical concentration and the measured
+    response.
+  </li>
+
+  <li>
+    <strong>Hover:</strong>
+    Moving the pointer over a chart element, such as a bar, point, or line, to
+    view its label and exact value.
+  </li>
+  </ul>
+
+  <h3 id="glossary-environmental-exposure-sampling">Environmental Exposure and Sampling</h3>
+  <ul>
+
+  <li>
+    <strong>Extract:</strong>
+    The solution produced when chemicals are removed from sampler material,
+    such as silicone, using solvents. The extract is analyzed by an instrument.
+  </li>
+
+  <li>
+    <strong>Analyte:</strong>
+    An individual chemical compound measured in an environmental or biological
+    sample.
+  </li>
+
+  <li>
+    <strong>External Exposure:</strong>
+    Contact with chemicals in the surrounding environment. External exposure is
+    different from internal dose, which refers to the amount of a chemical
+    present inside an organism.
+  </li>
+  </ul>
+
+  <h3 id="glossary-zebrafish-biological-endpoints">Zebrafish and Biological Endpoints</h3>
+  <ul>
+  <li>
+    <strong>Larval Photomotor Response (LPR):</strong>
+    A behavioral assay that measures zebrafish movement during alternating light
+    and dark cycles.
+  </li>
+  </ul>
+
+  <h3 id="glossary-dose-response-model-terms">Dose–Response and Model Terms</h3>
+  <ul>
+  <li>
+    <strong>Logistic:</strong>
+    Uses the logistic function to estimate the probability of a binary response,
+    which ranges from 0 to 1. It commonly produces an S-shaped
+    concentration–response curve.
+  </li>
+
+  <li>
+    <strong>Gamma:</strong>
+    Uses the gamma distribution to model positive, continuous, and often
+    right-skewed responses. It is generally used when the variability of the
+    response increases with its magnitude.
+  </li>
+
+  <li>
+    <strong>Log-Logistic:</strong>
+    Uses a logistic model with the logarithm of dose or concentration as the
+    predictor.
+  </li>
+
+  <li>
+    <strong>Probit:</strong>
+    Uses the cumulative standard normal distribution to estimate the probability
+    of a binary response. The predicted probability ranges from 0 to 1.
+  </li>
+
+  <li>
+    <strong>Log-Probit:</strong>
+    Uses a probit model with the logarithm of dose or concentration as the
+    predictor.
+  </li>
+
+  <li>
+    <strong>Multistage:</strong>
+    Uses a polynomial function of dose to represent the probability of a
+    response. The model can include linear and higher-order dose terms.
+  </li>
+
+  <li>
+    <strong>Quantal Linear:</strong>
+    Uses a linear dose-related component to model the probability of a quantal
+    response.
+  </li>
+
+  <li>
+    <strong>Weibull:</strong>
+    Uses a continuous probability distribution to model how the probability of
+    a response changes as chemical concentration increases.
+  </li>
+
+  <li>
+    <strong>Asymptotic Regression:</strong>
+    Used when a function changes gradually and approaches a fixed upper or lower
+    limit, known as an asymptote.
+  </li>
+
+  <li>
+    <strong>Exponential:</strong>
+    Models a response that increases or decreases at a rate proportional to its
+    current value.
+  </li>
+
+  <li>
+    <strong>Gompertz:</strong>
+    Used to model growth that starts slowly, changes most rapidly in the middle
+    of the concentration range, and then slows again as it approaches a limit,
+    often forming an asymmetric S-shaped curve.
+  </li>
+
+  <li>
+    <strong>Power:</strong>
+    Models the measured response as a power function of dose or concentration.
+    The power parameter determines whether the response increases at a
+    decreasing rate, linearly, or at an increasing rate.
+  </li>
+
+  <li>
+    <strong>Hill:</strong>
+    Models a response that approaches a maximum or minimum as dose or
+    concentration increases.
+  </li>
+
+  <li>
+    <strong>Michaelis–Menten:</strong>
+    Uses a saturation function to model a response that approaches a maximum or
+    minimum as concentration increases.
+  </li>
+
+  <li>
+    <strong>Goodness-of-Fit <em>p</em>-Value:</strong>
+    A statistical value used to evaluate how well a model describes the
+    observed data. In the model-selection workflow, models with a
+    <em>p</em>-value below 0.1 may be removed from consideration.
+  </li>
+
+  <li>
+    <strong>AIC (Akaike Information Criterion):</strong>
+    A statistic used to compare models while considering both model fit and
+    complexity. Lower AIC values generally indicate a better balance between
+    fit and complexity.
+  </li>
+
+    <li>
+    <strong>NA (Not Available):</strong>
+    Indicates that a model result or metric could not be estimated reliably
+    for a particular endpoint.
+    </li>
+
+    <li>
+    <strong>Model Selection:</strong>
+    The process of comparing candidate dose–response models and selecting the
+    model that best meets the fitting and evaluation criteria.
+    </li>
+  </ul>
+
+  <h3 id="glossary-units-measurements">Units and Measurements</h3>
+  <ul>
+  <li>
+    <strong>ng/L (Nanograms per Liter):</strong>
+    One billionth of a gram per liter.
+  </li>
+
+  <li>
+    <strong>pmol/mL (Picomoles per Milliliter):</strong>
+    One trillionth of a mole per milliliter.
+  </li>
+
+  <li>
+    <strong>Percentage Affected:</strong>
+    The percentage of organisms or samples showing a defined biological response
+    at a particular chemical concentration.
+  </li>
+
+  <li>
+    <strong>Concentration:</strong>
+    The amount of a chemical present in a specified volume or mass of a sample,
+    solution, or exposure medium.
+  </li>
+  </ul>
+  </section>
+
+
+
+    </details>
+
+
+
+
+
+
+
+
+</main>
+</div>
