@@ -248,15 +248,20 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
 
       $auc_html = $this->valueBarHtml($row->AUC, (string) $row->AUC);
 
+      // A missing BMD10/BMD50 only means "No model found" when the endpoint
+      // actually has an AUC; with no AUC there's no analysis at all, so it's
+      // plain NA across the row.
+      $missing_bmd_text = is_numeric($row->AUC) ? 'No model found' : 'NA';
+
       $bmd10_tooltip = is_numeric($row->BMD10) ? round((float) $row->BMD10, 4) . '/' . ($max_dose ?? 'NA') : '';
       $bmd10_value = (is_numeric($row->BMD10) && $max_dose) ? min(1, (float) $row->BMD10 / $max_dose) : NULL;
       $bmd10_flag_label = $this->bmdFlagLabel($row->BMD10_Flag ?? NULL, 'BMD10');
-      $bmd10_html = is_null($bmd10_value) ? 'NA' : $this->valueBarHtml($bmd10_value, $bmd10_tooltip, $bmd10_flag_label);
+      $bmd10_html = is_null($bmd10_value) ? $missing_bmd_text : $this->valueBarHtml($bmd10_value, $bmd10_tooltip, $bmd10_flag_label);
 
       $bmd50_tooltip = is_numeric($row->BMD50) ? round((float) $row->BMD50, 4) . '/' . ($max_dose ?? 'NA') : '';
       $bmd50_value = (is_numeric($row->BMD50) && $max_dose) ? min(1, (float) $row->BMD50 / $max_dose) : NULL;
       $bmd50_flag_label = $this->bmdFlagLabel($row->BMD50_Flag ?? NULL, 'BMD50');
-      $bmd50_html = is_null($bmd50_value) ? 'NA' : $this->valueBarHtml($bmd50_value, $bmd50_tooltip, $bmd50_flag_label);
+      $bmd50_html = is_null($bmd50_value) ? $missing_bmd_text : $this->valueBarHtml($bmd50_value, $bmd50_tooltip, $bmd50_flag_label);
 
       $endpoint_html = $has_data ? '<u>' . $endpoint_name . '</u>' : $endpoint_name;
 
