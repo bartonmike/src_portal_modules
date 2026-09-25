@@ -198,7 +198,7 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
         ON zsdr.Sample_ID = zsbmd.Sample_ID AND zsdr.End_Point_Name = zsbmd.End_Point_Name
       LEFT JOIN superfund_zebrafish_endpoint_descriptions zed
         ON zed.End_Point_Name = cen.End_Point_Name
-
+      WHERE AUC_Norm IS NOT NULL
       UNION
 
       SELECT 'Morphological Endpoints', '', NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, 1

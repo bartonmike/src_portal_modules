@@ -169,7 +169,7 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
     // -------------------------------------------------------------------------
     // 2. Confirm there is at least one endpoint with a complete BMD analysis.
     // -------------------------------------------------------------------------
-    $count = (int) $this->database
+    /*$count = (int) $this->database
       ->query(
         "SELECT COUNT(zcxy.X_vals) AS count
          FROM view_zebrafishChemXYCoords zcxy
@@ -178,6 +178,19 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
          INNER JOIN view_zebrafishChemBMDs zcbmd
            ON (zcxy.Chemical_ID = zcbmd.Chemical_ID AND zcxy.End_Point_Name = zcbmd.End_Point_Name)
          WHERE zcbmd.BMD10 IS NOT NULL AND zcxy.Chemical_ID = :chem_id",
+        [':chem_id' => $sanitized_id]
+      )
+      ->fetchField();*/
+
+    $count = (int) $this->database
+      ->query(
+        "SELECT COUNT(zcbmd.AUC_Norm) AS count
+         FROM view_zebrafishChemBMDs zcbmd
+         LEFT JOIN view_zebrafishChemDoseResponse zcdr
+           ON (zcbmd.Chemical_ID = zcdr.Chemical_ID AND zcbmd.End_Point_Name = zcdr.End_Point_Name)
+         LEFT JOIN view_zebrafishChemXYCoords zcxy
+           ON (zcxy.Chemical_ID = zcbmd.Chemical_ID AND zcxy.End_Point_Name = zcbmd.End_Point_Name)
+         WHERE zcbmd.BMD10 IS NOT NULL AND zcbmd.Chemical_ID = :chem_id",
         [':chem_id' => $sanitized_id]
       )
       ->fetchField();
