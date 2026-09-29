@@ -292,7 +292,7 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
         "SELECT DISTINCT zcdr.End_Point_Name AS end_point_name,
                  case zcdr.End_Point_Type
                   when 'Cellular' then 'Diultion (uM)'
-                  else 'Concentration (%)'
+                  else 'Concentration (percent)'
                   end as Y_Axis_Label,
                 zcbmd.AUC_Norm AS auc_norm, zcbmd.BMD10 AS bmd10, zcbmd.BMD50 AS bmd50,
                 zcbmd.Model AS model, zcbmd.DataQC_Flag AS dataqc_flag,
