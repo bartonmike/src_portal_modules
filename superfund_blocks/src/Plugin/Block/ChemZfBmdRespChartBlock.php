@@ -327,7 +327,7 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
       $auc_norm = $summary ? $this->roundSummaryValue((float) $summary->auc_norm) : 0.0;
       $bmd10    = $summary ? $this->roundSummaryValue((float) $summary->bmd10) : 0.0;
       $bmd50    = $summary ? $this->roundSummaryValue((float) $summary->bmd50) : 0.0;
-      $y_label = $summary->Y_Axis_Label;
+      $y_label = $summary-> Y_Axis_Label;
       $qc_icon  = $summary ? $this->dataQcIconHtml($summary->dataqc_flag) : '';
       $endpoint_name_html = $this->endpointNameHtml($endpoint_name, $summary->endpoint_link ?? NULL);
 
@@ -466,7 +466,7 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
     var layout = {
       yaxis: yaxis,
       xaxis: {
-        title: { text: $y_label },
+        title: { text: y_label },
       },
       showlegend: true,
       legend: {
