@@ -290,10 +290,6 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
     $summary_rows = $this->database
       ->query(
         "SELECT DISTINCT zcdr.End_Point_Name AS end_point_name,
-                 case zcdr.End_Point_Type
-                  when 'Cellular' then 'Diultion (uM)'
-                  else 'Concentration (percent)'
-                  end as Y_Axis_Label,
                 zcbmd.AUC_Norm AS auc_norm, zcbmd.BMD10 AS bmd10, zcbmd.BMD50 AS bmd50,
                 zcbmd.Model AS model, zcbmd.DataQC_Flag AS dataqc_flag,
                 zed.endPointLink AS endpoint_link
@@ -327,7 +323,6 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
       $auc_norm = $summary ? $this->roundSummaryValue((float) $summary->auc_norm) : 0.0;
       $bmd10    = $summary ? $this->roundSummaryValue((float) $summary->bmd10) : 0.0;
       $bmd50    = $summary ? $this->roundSummaryValue((float) $summary->bmd50) : 0.0;
-      $y_label = $summary-> Y_Axis_Label;
       $qc_icon  = $summary ? $this->dataQcIconHtml($summary->dataqc_flag) : '';
       $endpoint_name_html = $this->endpointNameHtml($endpoint_name, $summary->endpoint_link ?? NULL);
 
@@ -346,7 +341,6 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
         'qcIconHtml'   => $qc_icon,
         'subtitleHtml' => $subtitle_html,
         'modifier'     => $endpoint_modifiers[$endpoint_name] ?? 100,
-        'y_label' = $y_label,
       ];
 
       if ($default_endpoint_key === NULL || strtolower($endpoint_name) === 'any effect') {
@@ -467,7 +461,7 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
     var layout = {
       yaxis: yaxis,
       xaxis: {
-        title: { text: y_label },
+        title: { text: 'Dilution' },
       },
       showlegend: true,
       legend: {
