@@ -346,6 +346,7 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
         'qcIconHtml'   => $qc_icon,
         'subtitleHtml' => $subtitle_html,
         'modifier'     => $endpoint_modifiers[$endpoint_name] ?? 100,
+        'y_label' = $y_label,
       ];
 
       if ($default_endpoint_key === NULL || strtolower($endpoint_name) === 'any effect') {
