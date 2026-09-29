@@ -91,11 +91,11 @@ class ChemOverviewEndpointsChartHighchartsBlock extends BlockBase implements Blo
     $sql = "SELECT DISTINCT
         c.End_Point_Name AS category,
         c.End_Point_Type AS category_group,
-        (SELECT COUNT(c2.Chemical_ID)
+        (SELECT COUNT(distinct c2.Chemical_ID)
          FROM view_zebrafishChemXYCoords c2
          WHERE c2.End_Point_Name = c.End_Point_Name) AS value
       FROM view_chemical_endpoints c
-      WHERE c.End_Point_Name IS NOT NULL";
+      WHERE c.End_Point_Name IS NOT NULL;";
 
     $rows = $this->database->query($sql)->fetchAll();
 
