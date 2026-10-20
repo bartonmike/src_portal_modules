@@ -186,7 +186,7 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
         zed.endPointLink,
         CASE
           WHEN cen.End_Point_Name IN ('Behavior transition', '5 day total movement') THEN 4
-          When cen.End_Point_Name IN ('Comet Chip', 'Lactate Dehydrogenase', 'Mitochondrial Membrane Potential', 'Reactive Oxygen Species Detection') THEN 6
+          When cen.End_Point_Name IN ('DNA Damage', 'Cytotoxicity', 'Mitochondrial Membrane Damage', 'Oxidative Stress') THEN 6
           ELSE 2
         END AS sort_order
       FROM view_chemical_endpoints cen
@@ -209,7 +209,7 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
 
       UNION
 
-      SELECT 'Cellular Endpoints (Human Cell Line)', '', NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, 5
+      SELECT 'Cellular Endpoints (Primary Human Cells)', '', NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, 5
 
       ORDER BY sort_order, Endpoint";
 
@@ -228,7 +228,7 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
 
     $body_rows = [];
     foreach ($rows as $row) {
-      if (in_array($row->Endpoint, ['Morphological Endpoints', 'Behavioral Endpoints', 'Cellular Endpoints (Human Cell Line)'], TRUE)) {
+      if (in_array($row->Endpoint, ['Morphological Endpoints', 'Behavioral Endpoints', 'Cellular Endpoints (Primary Human Cells)'], TRUE)) {
         $body_rows[] = "<tr><td colspan='4'><b>" . htmlspecialchars($row->Endpoint, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</b></td></tr>';
         continue;
       }
@@ -284,13 +284,8 @@ class EnvSampZfBmdSelectorTableBlock extends BlockBase implements BlockPluginInt
     }
 
     $descriptor = "<div class='zf-table element-descriptor'>"
-      . '<strong>Zebrafish Morphological Measurements Table:</strong> This table shows an '
-      . '<strong>area under the curve </strong>(AUC) measurement for each modeled line. This '
-      . 'value is scaled between 0 and 1, where 0 indicates a flat line at 0% and 1 indicates '
-      . 'a flat line at 100%. Hover over the bar for the true value. Similarly, the '
-      . '<strong>BMD10 </strong>(the concentration where 10% of the zebrafish were affected) '
-      . 'and <strong>BMD50 </strong>are reported with a scale. Click the underlined name of '
-      . 'each measurement (endpoint) to see its plot.'
+      . '<strong>Endpoint Measurements Table:</strong> This table shows an '
+      . '<strong>area under the curve </strong>(AUC) measurement for each modeled line.'
       . '</div>';
 
     $html = "<table id='endpoint-table' class='display'>"
