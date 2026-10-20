@@ -375,7 +375,7 @@ class EnvSampZfBmdRespChartBlock extends BlockBase implements BlockPluginInterfa
       . "</div>"
       . "<div id='{$chart_id}' style='width:100%;height:400px;'></div>"
       . "<br /><div class='zf-endpoints-plot element-descriptor'>"
-      . "<strong>Zebrafish Morphological Measurements Plot:</strong> "
+      . "<strong>Endpoint Measurements Plot:</strong> "
       . "Plots can be selected from the measurements table on the left."
       . "</div>";
 
