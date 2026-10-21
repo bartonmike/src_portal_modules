@@ -461,7 +461,7 @@ class ChemZfBmdRespChartBlock extends BlockBase implements BlockPluginInterface,
     var layout = {
       yaxis: yaxis,
       xaxis: {
-        title: { text: 'Dilution' },
+        title: { text: 'Concentration (μM)' },
       },
       showlegend: true,
       legend: {
