@@ -264,7 +264,7 @@ class EnvSampEnvConcChartBlock extends BlockBase implements BlockPluginInterface
       ticktext: tickText,
     },
     yaxis: {
-      title: { text: 'Concentration ' + unit },
+      title: { text: 'Concentration (' + unit + ')'},
       rangemode: 'tozero',
     },
     dragmode: 'zoom',

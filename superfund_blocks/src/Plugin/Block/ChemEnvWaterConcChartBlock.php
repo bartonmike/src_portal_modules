@@ -246,7 +246,7 @@ class ChemEnvWaterConcChartBlock extends BlockBase implements BlockPluginInterfa
       ticktext: tickText,
     },
     yaxis: {
-      title: { text: 'Concentration ' + unit },
+      title: { text: 'Concentration (' + unit + ')'},
       rangemode: 'tozero',
     },
     dragmode: 'zoom',
