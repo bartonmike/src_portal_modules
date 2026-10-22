@@ -245,7 +245,8 @@ class EnvSampExtMolConcChartBlock extends BlockBase implements BlockPluginInterf
       ticktext: tickText,
     },
     yaxis: {
-      title: { text: 'Concentration (' + unit + ')'},
+      title: { text: 'Concentration (pmol/mL)'},
+      //title: { text: 'Concentration (' + unit + ')'},
       rangemode: 'tozero',
     },
     dragmode: 'zoom',
