@@ -14,7 +14,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * Provides the Chemical Info Header block.
  *
  * Displays the name, description, DTXCID, molecular formula, chemical class,
- * and structure image for the chemical identified by the ?id= or ?cas=
+ * structure image, CAS number, DTXSID, PubChem CID, and average mass for the
+ * chemical identified by the ?id= or ?cas=
  * query parameter. Meant to sit above the other chemical-page blocks.
  *
  * @Block(
@@ -91,7 +92,11 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
             `chemDescription` AS chemical_description,
             `DTXCID` AS dtxcid,
             `MOLECULAR_FORMULA` AS molecular_formula,
-            `chemical_class` AS chemical_class
+            `chemical_class` AS chemical_class,
+            `cas_number` AS cas_number,
+            `DTXSID` AS dtxsid,
+            `PUBCHEM_CID` AS pubchem_cid,
+            `AVERAGE_MASS` AS average_mass
           FROM `view_chemicals`
           WHERE `Chemical_ID` = :chem_id
           LIMIT 1',
@@ -117,6 +122,23 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
     $dtxcid_esc         = htmlspecialchars($row['dtxcid'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $chemical_class_esc = htmlspecialchars($row['chemical_class'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $dtxcid_url         = rawurlencode($row['dtxcid'] ?? '');
+    $cas_number_esc     = htmlspecialchars($row['cas_number'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $average_mass_esc   = htmlspecialchars($row['average_mass'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+    // CompTox SID and PubChem ID link out to their source databases when present.
+    $dtxsid_html = '';
+    if (!empty($row['dtxsid'])) {
+      $dtxsid_esc  = htmlspecialchars($row['dtxsid'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+      $dtxsid_url  = rawurlencode($row['dtxsid']);
+      $dtxsid_html = "<a target='_blank' rel='noopener' href='https://comptox.epa.gov/dashboard/chemical/details/{$dtxsid_url}'>{$dtxsid_esc}</a>";
+    }
+
+    $pubchem_html = '';
+    if (!empty($row['pubchem_cid'])) {
+      $pubchem_esc  = htmlspecialchars($row['pubchem_cid'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+      $pubchem_url  = rawurlencode($row['pubchem_cid']);
+      $pubchem_html = "<a target='_blank' rel='noopener' href='https://pubchem.ncbi.nlm.nih.gov/compound/{$pubchem_url}'>{$pubchem_esc}</a>";
+    }
 
     // Subscript the digits in the molecular formula, e.g. C6H6 -> C<sub>6</sub>H<sub>6</sub>.
     $formula_esc = htmlspecialchars($row['molecular_formula'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -147,6 +169,24 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
       . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_value chemical-structure'><img alt='{$chemical_name_esc}' src='{$chemical_image_url}'/></div>"
+      . '</div>'
+      . '</div>'
+      . "<div class='sample-info'>"
+      . "<div class='info-box'>"
+      . "<div class='field_label'><h2>CAS Number</h2></div>"
+      . "<div class='field_value'>{$cas_number_esc}</div>"
+      . '</div> '
+      . "<div class='info-box'>"
+      . "<div class='field_label'><h2>CompTox SID</h2></div>"
+      . "<div class='field_value'>{$dtxsid_html}</div>"
+      . '</div> '
+      . "<div class='info-box'>"
+      . "<div class='field_label'><h2>PubChem ID</h2></div>"
+      . "<div class='field_value'>{$pubchem_html}</div>"
+      . '</div> '
+      . "<div class='info-box'>"
+      . "<div class='field_label'><h2>Average Mass</h2></div>"
+      . "<div class='field_value'>{$average_mass_esc}</div>"
       . '</div>'
       . '</div>';
 

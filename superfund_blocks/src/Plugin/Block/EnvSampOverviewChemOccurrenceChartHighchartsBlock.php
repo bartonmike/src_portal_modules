@@ -103,6 +103,8 @@ class EnvSampOverviewChemOccurrenceChartHighchartsBlock extends BlockBase implem
     // -------------------------------------------------------------------------
     //$html = "<div id='{$chart_id}' class='highcharts-light' style='width:100%;height:400px;'></div>";
     
+//Total Count of Chemicals: A total count (non-unique) of all measured chemicals across all samples.
+
     $descriptor = "<div class='env-samp-overview-chem-occurence-element-descriptor'>"
       . "<strong>Total Observations:</strong> The number of times a chemical category was observed across all samples."
       . "</div>";
