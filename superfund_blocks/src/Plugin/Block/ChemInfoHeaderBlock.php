@@ -145,7 +145,11 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
     $formula_esc = preg_replace('/(\d+)/', '<sub>$1</sub>', $formula_esc);
 
     $chemical_image_url = "https://comptox.epa.gov/ctx-api/chemical/file/image/search/by-dtxcid/{$dtxcid_url}";
-    $dtxcid_link         = "https://comptox.epa.gov/dashboard/dsstoxdb/results?search={$dtxcid_url}";
+    // CompTox detail pages are keyed by DTXSID, so the DTXCID links to the same
+    // chemical's detail page when a DTXSID is available, else falls back to search.
+    $dtxcid_link = !empty($row['dtxsid'])
+      ? 'https://comptox.epa.gov/dashboard/chemical/details/' . rawurlencode($row['dtxsid'])
+      : "https://comptox.epa.gov/dashboard/dsstoxdb/results?search={$dtxcid_url}";
 
     // NOTE: the whitespace between </div> and the next <div class='info-box'>
     // is load-bearing — the CSS Injector rule that spaces these boxes out
@@ -156,8 +160,8 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
     $html = "<div class='sample-info-header'><h1>{$chemical_name_esc}</h1><p>{$description_esc}</p></div>"
       . "<div class='sample-info'>"
       . "<div class='info-box'>"
-      . "<div class='field_label'><h2>DTXCID</h2></div>"
-      . "<div class='field_value'><a href='{$dtxcid_link}'>{$dtxcid_esc}</a></div>"
+      . "<div class='field_label'><h2>CAS Number</h2></div>"
+      . "<div class='field_value'>{$cas_number_esc}</div>"
       . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Formula</h2></div>"
@@ -173,20 +177,20 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
       . '</div>'
       . "<div class='sample-info'>"
       . "<div class='info-box'>"
-      . "<div class='field_label'><h2>CAS Number</h2></div>"
-      . "<div class='field_value'>{$cas_number_esc}</div>"
-      . '</div> '
-      . "<div class='info-box'>"
-      . "<div class='field_label'><h2>CompTox SID</h2></div>"
-      . "<div class='field_value'>{$dtxsid_html}</div>"
+      . "<div class='field_label'><h2>Average Mass</h2></div>"
+      . "<div class='field_value'>{$average_mass_esc}</div>"
       . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>PubChem ID</h2></div>"
       . "<div class='field_value'>{$pubchem_html}</div>"
       . '</div> '
       . "<div class='info-box'>"
-      . "<div class='field_label'><h2>Average Mass</h2></div>"
-      . "<div class='field_value'>{$average_mass_esc}</div>"
+      . "<div class='field_label'><h2>CompTox DTXSID</h2></div>"
+      . "<div class='field_value'>{$dtxsid_html}</div>"
+      . '</div> '
+      . "<div class='info-box'>"
+      . "<div class='field_label'><h2>CompTox DTXCID</h2></div>"
+      . "<div class='field_value'><a href='{$dtxcid_link}'>{$dtxcid_esc}</a></div>"
       . '</div>'
       . '</div>';
 
