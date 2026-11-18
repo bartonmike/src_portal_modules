@@ -26,13 +26,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EnvSampOverviewEndpointsChartHighchartsBlock extends BlockBase implements BlockPluginInterface, ContainerFactoryPluginInterface {
 
   /**
-   * Bar color palette, cycled through per category.
+   * Single bar color — matches the blue used by the chemical endpoints chart
+   * (rgb(31, 119, 180)).
    */
-  protected const PALETTE = [
-    '#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A1FF33',
-    '#33A1FF', '#FF8C33', '#8C33FF', '#33FF8C', '#FF33FF',
-    '#FFD733', '#33FFD7', '#D733FF', '#33FF33', '#FF3333',
-  ];
+  protected const PALETTE = ['#1f77b4'];
 
   /**
    * The database connection.
@@ -162,7 +159,7 @@ class EnvSampOverviewEndpointsChartHighchartsBlock extends BlockBase implements 
     },
     plotOptions: {
       bar: {
-        colorByPoint: true,
+        colorByPoint: false,
       },
       series: {
         showInLegend: false,
