@@ -119,16 +119,20 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
     // -------------------------------------------------------------------------
     $esc = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-    // Returns the trimmed field value, or NULL when it's missing: NULL, empty,
-    // or a placeholder CAS like 3421_NO_CAS / 3411_No_CAS. Missing fields are
-    // shown as "Unknown" with no link.
+    // Returns the trimmed field value, or NULL when it's missing: a real NULL,
+    // empty, the literal string "NULL" (the import stores some missing values
+    // that way), or a placeholder CAS like 3421_NO_CAS / 3411_No_CAS. Missing
+    // fields are shown as "Unknown" with no link.
     $value_of = static function ($value): ?string {
       $value = trim((string) ($value ?? ''));
-      return ($value === '' || preg_match('/_NO_CAS$/i', $value)) ? NULL : $value;
+      return ($value === '' || strcasecmp($value, 'NULL') === 0 || preg_match('/_NO_CAS$/i', $value))
+        ? NULL
+        : $value;
     };
 
     $chemical_name_esc = $esc($row['chemical_name'] ?? '');
-    $description_esc   = $esc($row['chemical_description'] ?? '');
+    // A missing description is left blank rather than showing "Unknown".
+    $description_esc   = $esc($value_of($row['chemical_description'] ?? NULL) ?? '');
 
     $cas_number     = $value_of($row['cas_number'] ?? NULL);
     $dtxsid         = $value_of($row['dtxsid'] ?? NULL);
