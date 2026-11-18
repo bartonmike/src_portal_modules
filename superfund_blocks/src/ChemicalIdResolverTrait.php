@@ -23,12 +23,13 @@ trait ChemicalIdResolverTrait {
    */
   protected function resolveChemicalId(Request $request): ?string {
     $raw_cas       = $request->query->get('cas', '');
-    $sanitized_cas = strtoupper(preg_replace('/[^0-9A-Za-z_\-]/', '', $raw_cas));
+    $sanitized_cas = preg_replace('/[^0-9A-Za-z_\-]/', '', $raw_cas);
 
     // CAS Registry Number format: 2-7 digits, a 2-digit group, a check digit
     // (e.g. 50-00-0, 7440-38-2). Chemicals without a real CAS number are
-    // stored with a placeholder of the form <digits>_NO_CAS (e.g. 3421_NO_CAS).
-    if (preg_match('/^(\d{2,7}-\d{2}-\d|\d+_NO_CAS)$/', $sanitized_cas)) {
+    // stored with a placeholder of the form <digits>_NO_CAS (e.g. 3421_NO_CAS,
+    // 3411_No_CAS — casing varies in the data, so match case-insensitively).
+    if (preg_match('/^(\d{2,7}-\d{2}-\d|\d+_NO_CAS)$/i', $sanitized_cas)) {
       $chem_id = $this->database
         ->query(
           'SELECT `Chemical_ID` FROM `view_chemicals` WHERE `cas_number` = :cas ORDER BY `Chemical_ID` LIMIT 1',

@@ -127,7 +127,7 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
     $cas_number     = $row['cas_number'] ?? '';
     $cas_number_esc = htmlspecialchars($cas_number, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $cas_html       = $cas_number_esc;
-    if ($cas_number !== '' && !str_ends_with($cas_number, '_NO_CAS')) {
+    if ($cas_number !== '' && !preg_match('/_NO_CAS$/i', $cas_number)) {
       $cas_html = "<a target='_blank' rel='noopener' href='https://commonchemistry.cas.org/detail?cas_rn="
         . rawurlencode($cas_number) . "'>{$cas_number_esc}</a>";
     }
