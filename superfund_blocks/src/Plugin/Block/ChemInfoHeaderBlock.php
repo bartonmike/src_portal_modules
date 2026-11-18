@@ -173,7 +173,15 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
     $chemical_class_html = $chemical_class === NULL ? 'Unknown' : $esc($chemical_class);
     $average_mass_html   = $average_mass === NULL ? 'Unknown' : $esc($average_mass);
 
-    $chemical_image_url = "https://comptox.epa.gov/ctx-api/chemical/file/image/search/by-dtxcid/{$dtxcid_url}";
+    // Structure image, keyed by DTXSID. Omitted entirely (no column) when the
+    // chemical has no DTXSID, so the name and first row take the full width.
+    $structure_html = '';
+    if ($dtxsid !== NULL) {
+      $chemical_image_url = 'https://comptox.epa.gov/ctx-api/chemical/file/image/search/by-dtxsid/' . rawurlencode($dtxsid);
+      $structure_html = "<div class='chem-info-structure'>"
+        . "<img alt='Chemical structure of {$chemical_name_esc}' src='{$chemical_image_url}'/>"
+        . '</div>';
+    }
 
     // NOTE: the whitespace between </div> and the next <div class='info-box'>
     // is load-bearing — the CSS Injector rule that spaces these boxes out
@@ -181,7 +189,13 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
     // children, which only works if there's whitespace between them to
     // distribute. Collapsing this to a single concatenated string with no
     // gaps makes the boxes jam together with no spacing.
-    $html = "<div class='sample-info-header'><h1>{$chemical_name_esc}</h1><p>{$description_esc}</p></div>"
+    //
+    // Layout: .chem-info-top is a flex row holding the name + first row of
+    // identifiers (.chem-info-main) on the left and the structure image on
+    // the right; the second row of identifiers spans the full width below.
+    $html = "<div class='chem-info-top'>"
+      . "<div class='chem-info-main'>"
+      . "<div class='sample-info-header'><h1>{$chemical_name_esc}</h1><p>{$description_esc}</p></div>"
       . "<div class='sample-info'>"
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>CAS Number</h2></div>"
@@ -194,10 +208,10 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Chemical Class</h2></div>"
       . "<div class='field_value'>{$chemical_class_html}</div>"
-      . '</div> '
-      . "<div class='info-box'>"
-      . "<div class='field_value chemical-structure'><img alt='{$chemical_name_esc}' src='{$chemical_image_url}'/></div>"
       . '</div>'
+      . '</div>'
+      . '</div>'
+      . $structure_html
       . '</div>'
       . "<div class='sample-info'>"
       . "<div class='info-box'>"
@@ -218,9 +232,32 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
       . '</div>'
       . '</div>';
 
+    // Layout CSS goes in html_head rather than #markup: #markup is run through
+    // Xss::filter(), which strips <style> tags and style attributes.
+    $css = '.chem-info-top{display:flex;align-items:center;gap:24px;}'
+      . '.chem-info-main{flex:1 1 auto;min-width:0;}'
+      . '.chem-info-structure{flex:0 0 220px;text-align:center;}'
+      . '.chem-info-structure img{max-width:100%;height:auto;}'
+      . '@media (max-width:768px){'
+      . '.chem-info-top{flex-direction:column;}'
+      . '.chem-info-structure{flex-basis:auto;}'
+      . '}';
+
     return [
-      '#markup' => $html,
-      '#cache'  => [
+      '#markup'   => $html,
+      '#attached' => [
+        'html_head' => [
+          [
+            [
+              '#type'  => 'html_tag',
+              '#tag'   => 'style',
+              '#value' => $css,
+            ],
+            'superfund_chem_info_header_style',
+          ],
+        ],
+      ],
+      '#cache'    => [
         'contexts' => ['url.query_args:id', 'url.query_args:cas'],
       ],
     ];
