@@ -122,7 +122,15 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
     $dtxcid_esc         = htmlspecialchars($row['dtxcid'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $chemical_class_esc = htmlspecialchars($row['chemical_class'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $dtxcid_url         = rawurlencode($row['dtxcid'] ?? '');
-    $cas_number_esc     = htmlspecialchars($row['cas_number'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    // Placeholder CAS values (e.g. 3421_NO_CAS) mean the chemical has no real
+    // CAS number, so show plain text instead of a link.
+    $cas_number     = $row['cas_number'] ?? '';
+    $cas_number_esc = htmlspecialchars($cas_number, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $cas_html       = $cas_number_esc;
+    if ($cas_number !== '' && !str_ends_with($cas_number, '_NO_CAS')) {
+      $cas_html = "<a target='_blank' rel='noopener' href='https://commonchemistry.cas.org/detail?cas_rn="
+        . rawurlencode($cas_number) . "'>{$cas_number_esc}</a>";
+    }
     $average_mass_esc   = htmlspecialchars($row['average_mass'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
     // CompTox SID and PubChem ID link out to their source databases when present.
@@ -161,7 +169,7 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
       . "<div class='sample-info'>"
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>CAS Number</h2></div>"
-      . "<div class='field_value'>{$cas_number_esc}</div>"
+      . "<div class='field_value'>{$cas_html}</div>"
       . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Formula</h2></div>"
