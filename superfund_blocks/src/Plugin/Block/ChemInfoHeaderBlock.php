@@ -123,11 +123,14 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
     $chemical_class_esc = htmlspecialchars($row['chemical_class'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $dtxcid_url         = rawurlencode($row['dtxcid'] ?? '');
     // Placeholder CAS values (e.g. 3421_NO_CAS) mean the chemical has no real
-    // CAS number, so show plain text instead of a link.
+    // CAS number, so show "N/A" instead of a link.
     $cas_number     = $row['cas_number'] ?? '';
     $cas_number_esc = htmlspecialchars($cas_number, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $cas_html       = $cas_number_esc;
-    if ($cas_number !== '' && !preg_match('/_NO_CAS$/i', $cas_number)) {
+    if (preg_match('/_NO_CAS$/i', $cas_number)) {
+      $cas_html = 'N/A';
+    }
+    elseif ($cas_number !== '') {
       $cas_html = "<a target='_blank' rel='noopener' href='https://commonchemistry.cas.org/detail?cas_rn="
         . rawurlencode($cas_number) . "'>{$cas_number_esc}</a>";
     }
