@@ -117,50 +117,59 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
     // -------------------------------------------------------------------------
     // 3. Escape fields and build the header markup.
     // -------------------------------------------------------------------------
-    $chemical_name_esc  = htmlspecialchars($row['chemical_name'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    $description_esc    = htmlspecialchars($row['chemical_description'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    $dtxcid_esc         = htmlspecialchars($row['dtxcid'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    $chemical_class_esc = htmlspecialchars($row['chemical_class'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    $dtxcid_url         = rawurlencode($row['dtxcid'] ?? '');
-    // Placeholder CAS values (e.g. 3421_NO_CAS) mean the chemical has no real
-    // CAS number, so show "N/A" instead of a link.
-    $cas_number     = $row['cas_number'] ?? '';
-    $cas_number_esc = htmlspecialchars($cas_number, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    $cas_html       = $cas_number_esc;
-    if (preg_match('/_NO_CAS$/i', $cas_number)) {
-      $cas_html = 'N/A';
-    }
-    elseif ($cas_number !== '') {
-      $cas_html = "<a target='_blank' rel='noopener' href='https://commonchemistry.cas.org/detail?cas_rn="
-        . rawurlencode($cas_number) . "'>{$cas_number_esc}</a>";
-    }
-    $average_mass_esc   = htmlspecialchars($row['average_mass'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $esc = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+    // Returns the trimmed field value, or NULL when it's missing: NULL, empty,
+    // or a placeholder CAS like 3421_NO_CAS / 3411_No_CAS. Missing fields are
+    // shown as "Unknown" with no link.
+    $value_of = static function ($value): ?string {
+      $value = trim((string) ($value ?? ''));
+      return ($value === '' || preg_match('/_NO_CAS$/i', $value)) ? NULL : $value;
+    };
+
+    $chemical_name_esc = $esc($row['chemical_name'] ?? '');
+    $description_esc   = $esc($row['chemical_description'] ?? '');
+
+    $cas_number     = $value_of($row['cas_number'] ?? NULL);
+    $dtxsid         = $value_of($row['dtxsid'] ?? NULL);
+    $dtxcid         = $value_of($row['dtxcid'] ?? NULL);
+    $pubchem_cid    = $value_of($row['pubchem_cid'] ?? NULL);
+    $formula        = $value_of($row['molecular_formula'] ?? NULL);
+    $chemical_class = $value_of($row['chemical_class'] ?? NULL);
+    $average_mass   = $value_of($row['average_mass'] ?? NULL);
+
+    $cas_html = $cas_number === NULL ? 'Unknown'
+      : "<a target='_blank' rel='noopener' href='https://commonchemistry.cas.org/detail?cas_rn="
+        . rawurlencode($cas_number) . "'>" . $esc($cas_number) . '</a>';
 
     // CompTox SID and PubChem ID link out to their source databases when present.
-    $dtxsid_html = '';
-    if (!empty($row['dtxsid'])) {
-      $dtxsid_esc  = htmlspecialchars($row['dtxsid'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-      $dtxsid_url  = rawurlencode($row['dtxsid']);
-      $dtxsid_html = "<a target='_blank' rel='noopener' href='https://comptox.epa.gov/dashboard/chemical/details/{$dtxsid_url}'>{$dtxsid_esc}</a>";
-    }
+    $dtxsid_html = $dtxsid === NULL ? 'Unknown'
+      : "<a target='_blank' rel='noopener' href='https://comptox.epa.gov/dashboard/chemical/details/"
+        . rawurlencode($dtxsid) . "'>" . $esc($dtxsid) . '</a>';
 
-    $pubchem_html = '';
-    if (!empty($row['pubchem_cid'])) {
-      $pubchem_esc  = htmlspecialchars($row['pubchem_cid'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-      $pubchem_url  = rawurlencode($row['pubchem_cid']);
-      $pubchem_html = "<a target='_blank' rel='noopener' href='https://pubchem.ncbi.nlm.nih.gov/compound/{$pubchem_url}'>{$pubchem_esc}</a>";
+    $pubchem_html = $pubchem_cid === NULL ? 'Unknown'
+      : "<a target='_blank' rel='noopener' href='https://pubchem.ncbi.nlm.nih.gov/compound/"
+        . rawurlencode($pubchem_cid) . "'>" . $esc($pubchem_cid) . '</a>';
+
+    // CompTox detail pages are keyed by DTXSID, so the DTXCID links to the same
+    // chemical's detail page when a DTXSID is available, else falls back to search.
+    $dtxcid_url  = rawurlencode($dtxcid ?? '');
+    $dtxcid_html = 'Unknown';
+    if ($dtxcid !== NULL) {
+      $dtxcid_link = $dtxsid !== NULL
+        ? 'https://comptox.epa.gov/dashboard/chemical/details/' . rawurlencode($dtxsid)
+        : "https://comptox.epa.gov/dashboard/dsstoxdb/results?search={$dtxcid_url}";
+      $dtxcid_html = "<a href='{$dtxcid_link}'>" . $esc($dtxcid) . '</a>';
     }
 
     // Subscript the digits in the molecular formula, e.g. C6H6 -> C<sub>6</sub>H<sub>6</sub>.
-    $formula_esc = htmlspecialchars($row['molecular_formula'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    $formula_esc = preg_replace('/(\d+)/', '<sub>$1</sub>', $formula_esc);
+    $formula_html = $formula === NULL ? 'Unknown'
+      : preg_replace('/(\d+)/', '<sub>$1</sub>', $esc($formula));
+
+    $chemical_class_html = $chemical_class === NULL ? 'Unknown' : $esc($chemical_class);
+    $average_mass_html   = $average_mass === NULL ? 'Unknown' : $esc($average_mass);
 
     $chemical_image_url = "https://comptox.epa.gov/ctx-api/chemical/file/image/search/by-dtxcid/{$dtxcid_url}";
-    // CompTox detail pages are keyed by DTXSID, so the DTXCID links to the same
-    // chemical's detail page when a DTXSID is available, else falls back to search.
-    $dtxcid_link = !empty($row['dtxsid'])
-      ? 'https://comptox.epa.gov/dashboard/chemical/details/' . rawurlencode($row['dtxsid'])
-      : "https://comptox.epa.gov/dashboard/dsstoxdb/results?search={$dtxcid_url}";
 
     // NOTE: the whitespace between </div> and the next <div class='info-box'>
     // is load-bearing — the CSS Injector rule that spaces these boxes out
@@ -176,11 +185,11 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
       . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Formula</h2></div>"
-      . "<div class='field_value'>{$formula_esc}</div>"
+      . "<div class='field_value'>{$formula_html}</div>"
       . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Chemical Class</h2></div>"
-      . "<div class='field_value'>{$chemical_class_esc}</div>"
+      . "<div class='field_value'>{$chemical_class_html}</div>"
       . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_value chemical-structure'><img alt='{$chemical_name_esc}' src='{$chemical_image_url}'/></div>"
@@ -189,7 +198,7 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
       . "<div class='sample-info'>"
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>Average Mass</h2></div>"
-      . "<div class='field_value'>{$average_mass_esc}</div>"
+      . "<div class='field_value'>{$average_mass_html}</div>"
       . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>PubChem ID</h2></div>"
@@ -201,7 +210,7 @@ class ChemInfoHeaderBlock extends BlockBase implements BlockPluginInterface, Con
       . '</div> '
       . "<div class='info-box'>"
       . "<div class='field_label'><h2>CompTox DTXCID</h2></div>"
-      . "<div class='field_value'><a href='{$dtxcid_link}'>{$dtxcid_esc}</a></div>"
+      . "<div class='field_value'>{$dtxcid_html}</div>"
       . '</div>'
       . '</div>';
 
